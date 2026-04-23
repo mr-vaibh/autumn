@@ -1,0 +1,57 @@
+############################
+# Python
+############################
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+############################
+# Virtual environments
+############################
+venv/
+env/
+.venv/
+
+############################
+# Django
+############################
+*.log
+*.sqlite3
+db.sqlite3
+
+# Static & media
+staticfiles/
+media/
+
+# Migrations (optional — usually keep in production)
+# **/migrations/*
+# !**/migrations/__init__.py
+
+############################
+# Environment variables
+############################
+.env
+.env.*
+*.env
+
+############################
+# Testing / Coverage
+############################
+.coverage
+coverage/
+htmlcov/
+.pytest_cache/
+
+############################
+# Cache
+############################
+*.cache
+
+############################
+# IDE / OS
+############################
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
