@@ -19,6 +19,8 @@ The app automatically takes you to the right dashboard based on your role.
 
 > Therapists select **"Teacher / Therapist"** on the login screen.
 
+**Forgot your password?** Click "Forgot password?" on the login screen. You'll need to ask the admin to reset it for you.
+
 ---
 
 ## Admin
@@ -26,24 +28,31 @@ The app automatically takes you to the right dashboard based on your role.
 You manage everything. Here's the order to set things up from scratch:
 
 **1. Add Staff**  
-Go to **Staff → Add Staff**. Fill in name, email, role (Teacher / Therapist / Dietician), and a temporary password. Staff can change their password after logging in.
+Go to **Staff → Add Staff**. Fill in name, email, username, role (Teacher / Therapist / Dietician), and a password. Staff can change their password after logging in.
 
 **2. Add Students**  
-Go to **Students → Add Student**. Fill in the student's name, date of birth, autism level, and enrollment date.
+Go to **Students → Add Student**. Fill in the student's name, date of birth, autism level, and enrollment date. You can also edit or export the student list from this page.
 
-**3. Create Classes**  
+**3. Link Students to Parents**  
+Open a student's profile (click the eye icon). Go to the **Parents** tab and click **Link Parent**. Enter the parent's email address and select their relationship to the student.  
+> The parent must have an account first — add them via Staff if needed.
+
+**4. Create Classes**  
 Go to **Classes → Create Class**. Give it a name (e.g. "Level 1 - Morning Group"). Then click **Add Section** on the class card to create batches (e.g. "Morning Batch", capacity 8).
 
-**4. Set Up the Timetable**  
-Go to **Timetable → Add Period**. Select the subject, class, day, and time. Assign a teacher. Repeat for each session in the week.
+**5. Set Up the Timetable**  
+Go to **Timetable → Add Period**. Select the subject, class, day, start/end time, and pick a colour. Repeat for each session in the week.
 
-**5. Set Up Fees**  
-Go to **Fees → Create Fee Record**. Select the student, fee type, amount, and due date.
+**6. Set Up Fees**  
+Go to **Fees → Create Fee Record**. Link it to a student, set the amount, fee type, and due date. Use **Mark Paid** once payment is received.
 
-**6. Send Announcements**  
-Go to **Communication → New Announcement**. Choose who sees it — Everyone, Teachers only, or Parents only.
+**7. Send Announcements**  
+Go to **Communication → New Announcement**. Choose who sees it — Everyone, Teachers only, or Parents only. You can edit or delete announcements at any time.
 
-**7. View Reports**  
+**8. Diet & Nutrition**  
+Go to **Diet & Nutrition** to view meal plans and detox schedules created by dieticians.
+
+**9. View Reports**  
 Go to **Reports** to see attendance trends and therapy progress at a glance.
 
 ---
@@ -69,6 +78,8 @@ Your job is to run sessions and document them.
 
 You can see everything about your child.
 
+> If your dashboard is empty, your account hasn't been linked to your child yet. Contact the school admin.
+
 **What to check:**
 
 - **Dashboard** — today's attendance and any pending fees at a glance.
@@ -86,9 +97,9 @@ You can see everything about your child.
 ## All Users
 
 - **Change your password** — click your name in the top-right → Change Password.
-- **Edit your profile** — click your name → Profile Settings.
-- **Quick search** — press `⌘K` (Mac) or `Ctrl+K` (Windows) to jump to any page instantly.
-- **Notifications** — click the bell icon to see school announcements and updates.
+- **Edit your profile** — click your name → Profile Settings (name, phone, designation).
+- **Quick search** — press `⌘K` (Mac) or `Ctrl+K` (Windows) to search pages and students instantly. Use ↑↓ arrows to navigate, Enter to go.
+- **Notifications** — click the bell icon to see updates. Click "Mark all read" to clear the badge.
 
 ---
 
