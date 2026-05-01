@@ -87,7 +87,6 @@ export default function LoginPage() {
       setOtpEmail(data.email);
       setOtpSent(true);
       toast.success("OTP sent! Check your phone/email.");
-      }
     } catch (error: unknown) {
       const axiosError = error as { response?: { data?: { detail?: string } } };
       toast.error(axiosError.response?.data?.detail || "Failed to send OTP");
