@@ -7,6 +7,14 @@ import { z } from "zod";
 import { useAuth } from "@/contexts/AuthContext";
 import { authApi } from "@/lib/api";
 import toast from "react-hot-toast";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogFooter,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -41,6 +49,7 @@ export default function LoginPage() {
   const [selectedRole, setSelectedRole] = useState<Role>("ADMIN");
   const [isLoading, setIsLoading] = useState(false);
   const [otpEmail, setOtpEmail] = useState("");
+  const [forgotOpen, setForgotOpen] = useState(false);
 
   const {
     register: registerLogin,
@@ -192,6 +201,15 @@ export default function LoginPage() {
                 <p className="text-red-600 text-xs mt-1">{loginErrors.password.message}</p>
               )}
             </div>
+            <div className="text-right">
+              <button
+                type="button"
+                onClick={() => setForgotOpen(true)}
+                className="text-xs text-neutral-500 hover:text-black"
+              >
+                Forgot password?
+              </button>
+            </div>
             <button
               type="submit"
               disabled={isLoading}
@@ -307,6 +325,32 @@ export default function LoginPage() {
           </div>
         </div>
       </div>
+
+      {/* Forgot Password Dialog */}
+      <Dialog open={forgotOpen} onOpenChange={setForgotOpen}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Reset Password</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3 mt-2">
+            <p className="text-sm text-gray-600">
+              To reset your password, please contact your school administrator.
+            </p>
+            <div className="bg-neutral-50 rounded-lg p-3 border border-neutral-200">
+              <p className="text-xs text-neutral-500 font-medium">Admin Contact</p>
+              <p className="text-sm font-mono mt-1">admin@autism.school</p>
+            </div>
+            <p className="text-xs text-gray-400">
+              The admin can reset your password from the Staff Management panel.
+            </p>
+          </div>
+          <DialogFooter className="mt-4">
+            <Button className="bg-black text-white hover:bg-neutral-800 w-full" onClick={() => setForgotOpen(false)}>
+              Got it
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

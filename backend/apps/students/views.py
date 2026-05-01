@@ -16,6 +16,23 @@ class StudentViewSet(viewsets.ModelViewSet):
     ordering_fields = ['name', 'enrollment_date', 'created_at']
     ordering = ['name']
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        user = self.request.user
+        if user.role == 'PARENT':
+            student_ids = user.children.values_list('student_id', flat=True)
+            queryset = queryset.filter(id__in=student_ids)
+        elif user.role in ['TEACHER', 'THERAPIST']:
+            # Teachers see students in sections they teach
+            from apps.classes.models import Section
+            section_ids = Section.objects.filter(class_ref__class_teacher=user).values_list('id', flat=True)
+            teacher_section_ids = Section.objects.filter(
+                periods__teacher=user
+            ).values_list('id', flat=True)
+            all_section_ids = list(section_ids) + list(teacher_section_ids)
+            queryset = queryset.filter(sections__id__in=all_section_ids).distinct()
+        return queryset
+
     def get_serializer_class(self):
         if self.action == 'list':
             return StudentListSerializer

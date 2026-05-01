@@ -52,6 +52,7 @@ export default function TimetablePage() {
     start_time: "09:00",
     end_time: "10:00",
     room: "",
+    color: "#171717",
   });
 
   useEffect(() => {
@@ -100,7 +101,7 @@ export default function TimetablePage() {
                 await timetableApi.createPeriod({ ...newPeriod, class_ref: Number(newPeriod.class_ref) });
                 toast.success("Period added");
                 setDialogOpen(false);
-                setNewPeriod({ name: "", subject: "", class_ref: "", day_of_week: 0, start_time: "09:00", end_time: "10:00", room: "" });
+                setNewPeriod({ name: "", subject: "", class_ref: "", day_of_week: 0, start_time: "09:00", end_time: "10:00", room: "", color: "#171717" });
                 fetchPeriods();
               } catch (err: unknown) {
                 const e = err as { response?: { data?: Record<string, string[]> } };
@@ -153,6 +154,19 @@ export default function TimetablePage() {
               <div className="space-y-2">
                 <Label htmlFor="period-end">End Time</Label>
                 <Input id="period-end" type="time" required value={newPeriod.end_time} onChange={(e) => setNewPeriod({ ...newPeriod, end_time: e.target.value })} />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="period-color">Color</Label>
+              <div className="flex items-center gap-3">
+                <input
+                  type="color"
+                  id="period-color"
+                  value={newPeriod.color}
+                  onChange={(e) => setNewPeriod({ ...newPeriod, color: e.target.value })}
+                  className="h-10 w-16 rounded border border-input cursor-pointer"
+                />
+                <span className="text-sm text-gray-500">Choose session color</span>
               </div>
             </div>
             <div className="space-y-2">

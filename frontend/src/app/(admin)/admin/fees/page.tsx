@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { feesApi } from "@/lib/api";
+import api, { feesApi } from "@/lib/api";
 import { DataTable } from "@/components/shared/DataTable";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -54,12 +54,28 @@ export default function FeesPage() {
     discount_amount: 0,
   });
 
-  useEffect(() => {
+  const fetchFees = () => {
     feesApi.getStudentFees()
       .then((res) => setFees(res.data.results || res.data))
       .catch(() => setFees(mockFees))
       .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    fetchFees();
   }, []);
+
+  const handleMarkPaid = async (feeId: number) => {
+    setFees(prev => prev.map(f => f.id === feeId ? { ...f, status: 'paid' } : f));
+    try {
+      await api.patch(`/fees/student-fees/${feeId}/`, { status: 'paid' });
+      toast.success('Marked as paid');
+      fetchFees();
+    } catch {
+      toast.error('Failed to update');
+      fetchFees();
+    }
+  };
 
   const filteredFees = activeFilter === "all" ? fees : fees.filter((f) => f.status === activeFilter);
 
@@ -243,7 +259,7 @@ export default function FeesPage() {
           actions={(row) => (
             <div className="flex items-center gap-2 justify-end">
               {(row as unknown as StudentFee).status !== "paid" && (
-                <Button size="sm" variant="outline" className="text-xs">
+                <Button size="sm" variant="outline" className="text-xs" onClick={() => handleMarkPaid((row as unknown as StudentFee).id)}>
                   Mark Paid
                 </Button>
               )}

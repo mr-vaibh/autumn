@@ -5,6 +5,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework_simplejwt.exceptions import TokenError
+from django.conf import settings
 from django.contrib.auth import authenticate
 from apps.users.models import User
 from .models import OTPCode
@@ -12,11 +13,13 @@ from .serializers import (
     CustomTokenObtainPairSerializer, LoginSerializer,
     OTPRequestSerializer, OTPVerifySerializer, LogoutSerializer
 )
+from .throttles import LoginThrottle, OTPThrottle
 
 
 class LoginView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
     permission_classes = [AllowAny]
+    throttle_classes = [LoginThrottle]
 
 
 class RefreshTokenView(TokenRefreshView):
@@ -25,6 +28,7 @@ class RefreshTokenView(TokenRefreshView):
 
 class OTPRequestView(APIView):
     permission_classes = [AllowAny]
+    throttle_classes = [OTPThrottle]
 
     def post(self, request):
         serializer = OTPRequestSerializer(data=request.data)
@@ -35,10 +39,10 @@ class OTPRequestView(APIView):
                 otp = OTPCode.generate_otp(user)
                 # In production, send via SMS/email
                 print(f"OTP for {email}: {otp.code}")
-                return Response({
-                    'detail': 'OTP sent successfully',
-                    'debug_otp': otp.code  # Remove in production
-                })
+                response_data = {'detail': 'OTP sent successfully'}
+                if settings.DEBUG:
+                    response_data['debug_otp'] = otp.code
+                return Response(response_data)
             except User.DoesNotExist:
                 return Response({'detail': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -46,6 +50,7 @@ class OTPRequestView(APIView):
 
 class OTPVerifyView(APIView):
     permission_classes = [AllowAny]
+    throttle_classes = [OTPThrottle]
 
     def post(self, request):
         serializer = OTPVerifySerializer(data=request.data)

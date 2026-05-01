@@ -2,13 +2,22 @@
 
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
-import { studentsApi } from "@/lib/api";
+import { studentsApi, usersApi } from "@/lib/api";
+import api from "@/lib/api";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogFooter,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { formatDate } from "@/lib/utils";
-import { ArrowLeft, Edit, Phone, Calendar, FileText, Activity, Users } from "lucide-react";
+import { ArrowLeft, Edit, Phone, Calendar, FileText, Activity, UserPlus } from "lucide-react";
 import Link from "next/link";
+import toast from "react-hot-toast";
 
 interface Student {
   id: number;
@@ -34,6 +43,13 @@ interface Student {
     relationship: string;
     is_primary: boolean;
   }>;
+}
+
+interface FoundUser {
+  id: number;
+  full_name?: string;
+  name?: string;
+  email: string;
 }
 
 const mockStudent: Student = {
@@ -63,12 +79,85 @@ export default function StudentDetailPage() {
   const [student, setStudent] = useState<Student | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    studentsApi.get(Number(params.id))
+  // Link Parent dialog state
+  const [linkOpen, setLinkOpen] = useState(false);
+  const [parentEmail, setParentEmail] = useState("");
+  const [relationship, setRelationship] = useState("father");
+  const [foundUser, setFoundUser] = useState<FoundUser | null>(null);
+  const [userSearching, setUserSearching] = useState(false);
+  const [linking, setLinking] = useState(false);
+
+  const studentId = Number(params.id);
+
+  const fetchStudent = () => {
+    studentsApi.get(studentId)
       .then((res) => setStudent(res.data))
       .catch(() => setStudent(mockStudent))
       .finally(() => setLoading(false));
+  };
+
+  const fetchParents = () => {
+    api.get(`/students/${studentId}/parents/`)
+      .then((res) => {
+        setStudent((prev) => prev ? { ...prev, parents: res.data } : prev);
+      })
+      .catch(() => {
+        // silently keep existing parent data
+      });
+  };
+
+  useEffect(() => {
+    fetchStudent();
   }, [params.id]);
+
+  useEffect(() => {
+    if (student) {
+      fetchParents();
+    }
+  }, [student?.id]);
+
+  const handleEmailBlur = async () => {
+    if (!parentEmail) return;
+    setUserSearching(true);
+    setFoundUser(null);
+    try {
+      const res = await usersApi.getAll({ search: parentEmail });
+      const results: FoundUser[] = res.data?.results ?? res.data;
+      const match = results.find(
+        (u: FoundUser) => u.email?.toLowerCase() === parentEmail.toLowerCase()
+      );
+      if (match) {
+        setFoundUser(match);
+      } else {
+        toast.error("No user found with that email.");
+      }
+    } catch {
+      toast.error("Failed to search for user.");
+    } finally {
+      setUserSearching(false);
+    }
+  };
+
+  const handleLinkParent = async () => {
+    if (!foundUser) return;
+    setLinking(true);
+    try {
+      await api.post(`/students/${studentId}/parents/`, {
+        parent: foundUser.id,
+        relationship,
+      });
+      toast.success("Parent linked successfully.");
+      setLinkOpen(false);
+      setParentEmail("");
+      setFoundUser(null);
+      setRelationship("father");
+      fetchParents();
+    } catch {
+      toast.error("Failed to link parent. They may already be linked.");
+    } finally {
+      setLinking(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -214,6 +303,25 @@ export default function StudentDetailPage() {
 
         <TabsContent value="parents" className="mt-4">
           <div className="space-y-3">
+            {/* Header row with Link Parent button */}
+            <div className="flex items-center justify-between">
+              <h3 className="font-semibold text-gray-900">Linked Parents</h3>
+              <Button
+                size="sm"
+                className="gap-2 bg-black hover:bg-neutral-800 text-white"
+                onClick={() => setLinkOpen(true)}
+              >
+                <UserPlus className="w-4 h-4" />
+                Link Parent
+              </Button>
+            </div>
+
+            {student.parents.length === 0 && (
+              <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+                <p className="text-gray-400 text-sm text-center">No parents linked yet</p>
+              </div>
+            )}
+
             {student.parents.map((parent) => (
               <div key={parent.id} className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 flex items-center justify-between">
                 <div className="flex items-center gap-4">
@@ -256,6 +364,97 @@ export default function StudentDetailPage() {
           </div>
         </TabsContent>
       </Tabs>
+
+      {/* Link Parent Dialog */}
+      <Dialog open={linkOpen} onOpenChange={(open) => {
+        setLinkOpen(open);
+        if (!open) {
+          setParentEmail("");
+          setFoundUser(null);
+          setRelationship("father");
+        }
+      }}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Link Parent to Student</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 mt-2">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                Parent Email
+              </label>
+              <input
+                type="email"
+                value={parentEmail}
+                onChange={(e) => {
+                  setParentEmail(e.target.value);
+                  setFoundUser(null);
+                }}
+                onBlur={handleEmailBlur}
+                placeholder="parent@example.com"
+                className="w-full px-3 py-2.5 bg-white border border-neutral-300 rounded-lg text-black placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all"
+              />
+              <p className="text-xs text-neutral-400 mt-1">Tab out or click away to search</p>
+            </div>
+
+            {userSearching && (
+              <div className="flex items-center gap-2 text-sm text-neutral-500">
+                <div className="w-4 h-4 border-2 border-neutral-300 border-t-transparent rounded-full animate-spin" />
+                Searching...
+              </div>
+            )}
+
+            {foundUser && (
+              <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                <p className="text-xs text-green-600 font-medium mb-0.5">User found</p>
+                <p className="text-sm font-semibold text-gray-900">
+                  {foundUser.full_name ?? foundUser.name ?? foundUser.email}
+                </p>
+                <p className="text-xs text-gray-500">{foundUser.email}</p>
+              </div>
+            )}
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                Relationship
+              </label>
+              <select
+                value={relationship}
+                onChange={(e) => setRelationship(e.target.value)}
+                className="w-full px-3 py-2.5 bg-white border border-neutral-300 rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all"
+              >
+                <option value="father">Father</option>
+                <option value="mother">Mother</option>
+                <option value="guardian">Guardian</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+          </div>
+          <DialogFooter className="mt-4 gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setLinkOpen(false)}
+              disabled={linking}
+            >
+              Cancel
+            </Button>
+            <Button
+              className="bg-black text-white hover:bg-neutral-800"
+              onClick={handleLinkParent}
+              disabled={!foundUser || linking}
+            >
+              {linking ? (
+                <span className="flex items-center gap-2">
+                  <div className="w-4 h-4 border-2 border-neutral-500 border-t-white rounded-full animate-spin" />
+                  Linking...
+                </span>
+              ) : (
+                "Link Parent"
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

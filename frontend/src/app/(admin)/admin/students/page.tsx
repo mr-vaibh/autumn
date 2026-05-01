@@ -47,11 +47,29 @@ const levelLabels: Record<string, string> = {
   Level3: "Level 3",
 };
 
+function exportToCSV(students: Student[]) {
+  const headers = ['Name', 'Student ID', 'Age', 'Autism Level', 'Enrollment Date', 'Status'];
+  const rows = students.map(s => [
+    s.name, s.student_id, s.age, s.autism_level, s.enrollment_date, s.is_active ? 'Active' : 'Inactive'
+  ]);
+  const csv = [headers, ...rows].map(r => r.join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `students_${new Date().toISOString().split('T')[0]}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 export default function StudentsPage() {
   const [students, setStudents] = useState<Student[]>([]);
   const [loading, setLoading] = useState(true);
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [editStudent, setEditStudent] = useState<Student | null>(null);
+  const [editForm, setEditForm] = useState({ name: '', date_of_birth: '', autism_level: 'Level1', diagnosis: '' });
+  const [editSubmitting, setEditSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     date_of_birth: "",
@@ -107,6 +125,38 @@ export default function StudentsPage() {
   useEffect(() => {
     fetchStudents();
   }, []);
+
+  useEffect(() => {
+    if (editStudent) {
+      setEditForm({
+        name: editStudent.name,
+        date_of_birth: editStudent.date_of_birth,
+        autism_level: editStudent.autism_level,
+        diagnosis: editStudent.diagnosis || '',
+      });
+    }
+  }, [editStudent]);
+
+  const handleEditStudent = async () => {
+    if (!editStudent) return;
+    if (!editForm.name || !editForm.date_of_birth) {
+      toast.error("Name and date of birth are required");
+      return;
+    }
+    setEditSubmitting(true);
+    try {
+      await studentsApi.update(editStudent.id, editForm as unknown as Record<string, unknown>);
+      toast.success("Student updated successfully");
+      setEditStudent(null);
+      fetchStudents();
+    } catch (err: unknown) {
+      const e = err as { response?: { data?: Record<string, string[]> } };
+      const msg = e.response?.data ? Object.values(e.response.data).flat()[0] : "Failed to update student";
+      toast.error(msg as string);
+    } finally {
+      setEditSubmitting(false);
+    }
+  };
 
   const columns = [
     {
@@ -174,7 +224,7 @@ export default function StudentsPage() {
           <p className="text-sm text-gray-500 mt-0.5">{students.length} total students enrolled</p>
         </div>
         <div className="flex items-center gap-3">
-          <Button variant="outline" size="sm" className="gap-2">
+          <Button variant="outline" size="sm" className="gap-2" onClick={() => exportToCSV(students)}>
             <Download className="w-4 h-4" />
             Export
           </Button>
@@ -253,6 +303,45 @@ export default function StudentsPage() {
         ))}
       </div>
 
+      {/* Edit Student Dialog */}
+      <Dialog open={editStudent !== null} onOpenChange={(open) => { if (!open) setEditStudent(null); }}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Edit Student</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="edit-name">Name *</Label>
+              <Input id="edit-name" value={editForm.name} onChange={(e) => setEditForm({ ...editForm, name: e.target.value })} placeholder="Student name" />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="edit-dob">Date of Birth *</Label>
+                <Input id="edit-dob" type="date" value={editForm.date_of_birth} onChange={(e) => setEditForm({ ...editForm, date_of_birth: e.target.value })} />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="edit-level">Autism Level</Label>
+                <select id="edit-level" value={editForm.autism_level} onChange={(e) => setEditForm({ ...editForm, autism_level: e.target.value })} className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
+                  <option value="Level1">Level 1</option>
+                  <option value="Level2">Level 2</option>
+                  <option value="Level3">Level 3</option>
+                </select>
+              </div>
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="edit-diagnosis">Diagnosis</Label>
+              <Textarea id="edit-diagnosis" value={editForm.diagnosis} onChange={(e) => setEditForm({ ...editForm, diagnosis: e.target.value })} placeholder="Optional diagnosis details" rows={3} />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditStudent(null)}>Cancel</Button>
+            <Button className="bg-black text-white hover:bg-neutral-800" onClick={handleEditStudent} disabled={editSubmitting}>
+              {editSubmitting ? "Saving..." : "Save Changes"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Table */}
       <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
         <DataTable
@@ -269,7 +358,7 @@ export default function StudentsPage() {
                   <Eye className="w-4 h-4" />
                 </Button>
               </Link>
-              <Button variant="ghost" size="icon" className="h-8 w-8">
+              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setEditStudent(row as unknown as Student)}>
                 <Edit className="w-4 h-4" />
               </Button>
             </div>

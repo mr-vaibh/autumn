@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { StatsCard } from "@/components/shared/StatsCard";
 import { useAuth } from "@/contexts/AuthContext";
 import { formatDate } from "@/lib/utils";
 import { Calendar, FileText, CreditCard, Bell, Star } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import api from "@/lib/api";
 
 const childInfo = {
   name: "Arjun Kumar",
@@ -47,6 +48,34 @@ function StarRating({ rating }: { rating: number }) {
 
 export default function ParentDashboard() {
   const { user } = useAuth();
+  const [hasChildren, setHasChildren] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    api.get("/students/students/")
+      .then((res) => {
+        const data = res.data.results || res.data;
+        setHasChildren(Array.isArray(data) && data.length > 0);
+      })
+      .catch(() => {
+        // If API fails, assume children exist (fall back to mock data view)
+        setHasChildren(true);
+      });
+  }, []);
+
+  if (hasChildren === false) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Welcome, {user?.full_name?.split(" ")[0]}!</h1>
+          <p className="text-gray-500 text-sm mt-0.5">{formatDate(new Date())} | Your child&apos;s overview</p>
+        </div>
+        <div className="text-center py-16 text-gray-400">
+          <p className="text-lg font-medium text-gray-600">No children linked to your account</p>
+          <p className="text-sm mt-2">Please contact the school administrator to link your child&apos;s profile.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

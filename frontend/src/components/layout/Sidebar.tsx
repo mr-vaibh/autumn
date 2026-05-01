@@ -9,7 +9,7 @@ import {
   LayoutDashboard, Users, GraduationCap, Calendar, FileText,
   CreditCard, MessageSquare, BarChart3,
   ChevronLeft, ChevronRight, LogOut,
-  UserCheck, School
+  UserCheck, School, Utensils
 } from "lucide-react";
 
 interface NavItem {
@@ -27,6 +27,7 @@ const adminNavItems: NavItem[] = [
   { label: "Fees", href: "/admin/fees", icon: CreditCard },
   { label: "Communication", href: "/admin/communication", icon: MessageSquare },
   { label: "Reports", href: "/admin/reports", icon: BarChart3 },
+  { label: "Diet & Nutrition", href: "/admin/diet", icon: Utensils },
 ];
 
 const teacherNavItems: NavItem[] = [

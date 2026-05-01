@@ -24,7 +24,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { communicationApi, usersApi } from "@/lib/api";
+import { communicationApi, usersApi, studentsApi } from "@/lib/api";
 import api from "@/lib/api";
 import toast from "react-hot-toast";
 
@@ -97,27 +97,44 @@ function timeAgo(dateStr: string): string {
 
 // ─── Sub-components ──────────────────────────────────────────────────────────
 
+// ─── Dynamic search result type ─────────────────────────────────────────────
+
+interface SearchResult {
+  label: string;
+  path: string;
+  subtitle?: string;
+}
+
 /** Quick-search dialog */
 function SearchDialog({
   open,
   onClose,
+  dynamicResults,
 }: {
   open: boolean;
   onClose: () => void;
+  dynamicResults: SearchResult[];
 }) {
   const [query, setQuery] = useState("");
   const [activeIndex, setActiveIndex] = useState(0);
   const router = useRouter();
   const listRef = useRef<HTMLUListElement>(null);
 
-  const results = query.trim()
-    ? QUICK_LINKS.filter((l) =>
-        l.label.toLowerCase().includes(query.toLowerCase())
-      )
+  const allResults: SearchResult[] = query.trim()
+    ? [
+        ...QUICK_LINKS.filter((l) =>
+          l.label.toLowerCase().includes(query.toLowerCase())
+        ),
+        ...dynamicResults.filter(
+          (r) =>
+            r.label.toLowerCase().includes(query.toLowerCase()) ||
+            (r.subtitle && r.subtitle.toLowerCase().includes(query.toLowerCase()))
+        ),
+      ]
     : QUICK_LINKS;
 
   // Reset when results change
-  useEffect(() => { setActiveIndex(0); }, [results.length]);
+  useEffect(() => { setActiveIndex(0); }, [allResults.length]);
 
   // Reset on close
   useEffect(() => {
@@ -138,13 +155,13 @@ function SearchDialog({
   function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
     if (e.key === "ArrowDown") {
       e.preventDefault();
-      setActiveIndex((i) => (i + 1) % results.length);
+      setActiveIndex((i) => (i + 1) % Math.max(allResults.length, 1));
     } else if (e.key === "ArrowUp") {
       e.preventDefault();
-      setActiveIndex((i) => (i - 1 + results.length) % results.length);
+      setActiveIndex((i) => (i - 1 + Math.max(allResults.length, 1)) % Math.max(allResults.length, 1));
     } else if (e.key === "Enter") {
       e.preventDefault();
-      if (results[activeIndex]) handleSelect(results[activeIndex].path);
+      if (allResults[activeIndex]) handleSelect(allResults[activeIndex].path);
     }
   }
 
@@ -158,7 +175,7 @@ function SearchDialog({
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Search pages..."
+            placeholder="Search pages, students, staff..."
             className="flex-1 text-sm outline-none placeholder:text-gray-400"
           />
           {query && (
@@ -168,11 +185,11 @@ function SearchDialog({
           )}
         </div>
         <ul ref={listRef} className="py-1 max-h-72 overflow-y-auto">
-          {results.length === 0 && (
+          {allResults.length === 0 && (
             <li className="px-4 py-3 text-sm text-gray-400">No results found</li>
           )}
-          {results.map((link, idx) => (
-            <li key={link.path}>
+          {allResults.map((link, idx) => (
+            <li key={`${link.path}-${idx}`}>
               <button
                 data-active={idx === activeIndex ? "true" : "false"}
                 onClick={() => handleSelect(link.path)}
@@ -183,8 +200,15 @@ function SearchDialog({
                     : "text-gray-700 hover:bg-gray-50"
                 }`}
               >
-                <ChevronRight className={`w-3.5 h-3.5 ${idx === activeIndex ? "text-white" : "text-gray-400"}`} />
-                {link.label}
+                <ChevronRight className={`w-3.5 h-3.5 shrink-0 ${idx === activeIndex ? "text-white" : "text-gray-400"}`} />
+                <div className="min-w-0">
+                  <div>{link.label}</div>
+                  {link.subtitle && (
+                    <div className={`text-xs mt-0.5 ${idx === activeIndex ? "text-gray-300" : "text-gray-400"}`}>
+                      {link.subtitle}
+                    </div>
+                  )}
+                </div>
               </button>
             </li>
           ))}
@@ -567,12 +591,57 @@ export function Header() {
   const breadcrumbs = getBreadcrumb(pathname);
 
   const [notifCount, setNotifCount] = useState(0);
+  const [dynamicResults, setDynamicResults] = useState<{ label: string; path: string; subtitle?: string }[]>([]);
 
   // Dialog open states
   const [searchOpen, setSearchOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [passwordOpen, setPasswordOpen] = useState(false);
+
+  // Fetch students and staff for search (admin only)
+  useEffect(() => {
+    if (user?.role !== "ADMIN") return;
+    Promise.allSettled([
+      studentsApi.getAll({ page_size: 200 }),
+      usersApi.getAll({ page_size: 200 }),
+    ]).then(([studentsRes, usersRes]) => {
+      const results: { label: string; path: string; subtitle?: string }[] = [];
+
+      if (studentsRes.status === "fulfilled") {
+        const data = studentsRes.value.data;
+        const students = Array.isArray(data) ? data : data?.results ?? [];
+        for (const s of students) {
+          const name = s.full_name || `${s.first_name || ""} ${s.last_name || ""}`.trim();
+          if (name) {
+            results.push({
+              label: name,
+              path: `/admin/students/${s.id}`,
+              subtitle: s.student_id ? `Student ID: ${s.student_id}` : "Student",
+            });
+          }
+        }
+      }
+
+      if (usersRes.status === "fulfilled") {
+        const data = usersRes.value.data;
+        const users = Array.isArray(data) ? data : data?.results ?? [];
+        for (const u of users) {
+          const name = u.full_name || `${u.first_name || ""} ${u.last_name || ""}`.trim();
+          const role = u.role as string | undefined;
+          if (name && role && role !== "ADMIN" && role !== "PARENT") {
+            results.push({
+              label: name,
+              path: "/admin/staff",
+              subtitle: role.charAt(0) + role.slice(1).toLowerCase(),
+            });
+          }
+        }
+      }
+
+      setDynamicResults(results);
+    });
+  }, [user?.role]);
 
   // Fetch unread count on mount
   useEffect(() => {
@@ -695,7 +764,7 @@ export function Header() {
       </header>
 
       {/* Dialogs — rendered outside the header so z-index is not clipped */}
-      <SearchDialog open={searchOpen} onClose={() => setSearchOpen(false)} />
+      <SearchDialog open={searchOpen} onClose={() => setSearchOpen(false)} dynamicResults={dynamicResults} />
 
       <NotificationsDialog
         open={notifOpen}

@@ -43,8 +43,18 @@ class Student(models.Model):
         if not self.student_id:
             import datetime
             year = datetime.date.today().year
-            count = Student.objects.count() + 1
-            self.student_id = f"GALS{year}{count:04d}"
+            from django.db.models import Max
+            last = Student.objects.filter(
+                student_id__startswith=f'GALS{year}'
+            ).aggregate(Max('student_id'))['student_id__max']
+            if last:
+                try:
+                    num = int(last[-4:]) + 1
+                except (ValueError, IndexError):
+                    num = Student.objects.count() + 1
+            else:
+                num = 1
+            self.student_id = f"GALS{year}{num:04d}"
         super().save(*args, **kwargs)
 
     @property

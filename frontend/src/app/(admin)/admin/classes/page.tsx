@@ -311,9 +311,9 @@ export default function ClassesPage() {
                 </div>
 
                 <div className="flex gap-2 mt-4">
-                  <Link href="/admin/timetable" className="flex-1">
+                  <Link href="/admin/reports" className="flex-1">
                     <Button size="sm" variant="outline" className="w-full text-xs">
-                      View Sessions
+                      View Reports
                     </Button>
                   </Link>
                   <Button

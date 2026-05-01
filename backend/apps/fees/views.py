@@ -50,8 +50,11 @@ class StudentFeeViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = super().get_queryset()
         if self.request.user.role == 'PARENT':
-            student_ids = self.request.user.children.values_list('student_id', flat=True)
-            queryset = queryset.filter(student__in=student_ids)
+            from apps.students.models import StudentParent
+            student_ids = StudentParent.objects.filter(
+                parent=self.request.user
+            ).values_list('student_id', flat=True)
+            queryset = queryset.filter(student__id__in=student_ids)
         return queryset
 
 
