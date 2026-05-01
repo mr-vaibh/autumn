@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogT
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Plus, Eye, Edit, Download } from "lucide-react";
+import { Plus, Eye, Edit, Download, Trash2 } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import toast from "react-hot-toast";
 
@@ -70,6 +70,8 @@ export default function StudentsPage() {
   const [editStudent, setEditStudent] = useState<Student | null>(null);
   const [editForm, setEditForm] = useState({ name: '', date_of_birth: '', autism_level: 'Level1', diagnosis: '' });
   const [editSubmitting, setEditSubmitting] = useState(false);
+  const [deleteStudent, setDeleteStudent] = useState<Student | null>(null);
+  const [deleting, setDeleting] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     date_of_birth: "",
@@ -136,6 +138,21 @@ export default function StudentsPage() {
       });
     }
   }, [editStudent]);
+
+  const handleDeleteStudent = async () => {
+    if (!deleteStudent) return;
+    setDeleting(true);
+    try {
+      await studentsApi.delete(deleteStudent.id);
+      toast.success("Student deleted");
+      setDeleteStudent(null);
+      setStudents((prev) => prev.filter((s) => s.id !== deleteStudent.id));
+    } catch {
+      toast.error("Failed to delete student");
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   const handleEditStudent = async () => {
     if (!editStudent) return;
@@ -342,6 +359,24 @@ export default function StudentsPage() {
         </DialogContent>
       </Dialog>
 
+      {/* Delete Confirm Dialog */}
+      <Dialog open={deleteStudent !== null} onOpenChange={(open) => { if (!open) setDeleteStudent(null); }}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Delete Student</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-gray-600 mt-1">
+            Are you sure you want to delete <strong>{deleteStudent?.name}</strong>? This will permanently remove all their records including attendance, fees, and session reports.
+          </p>
+          <DialogFooter className="mt-4">
+            <Button variant="outline" onClick={() => setDeleteStudent(null)}>Cancel</Button>
+            <Button disabled={deleting} onClick={handleDeleteStudent} className="bg-red-600 hover:bg-red-700 text-white">
+              {deleting ? "Deleting..." : "Delete"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Table */}
       <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
         <DataTable
@@ -360,6 +395,9 @@ export default function StudentsPage() {
               </Link>
               <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setEditStudent(row as unknown as Student)}>
                 <Edit className="w-4 h-4" />
+              </Button>
+              <Button variant="ghost" size="icon" className="h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50" onClick={() => setDeleteStudent(row as unknown as Student)}>
+                <Trash2 className="w-4 h-4" />
               </Button>
             </div>
           )}
