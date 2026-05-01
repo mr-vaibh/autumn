@@ -20,6 +20,41 @@ class FeeStructureViewSet(viewsets.ModelViewSet):
     filterset_fields = ['academic_year', 'frequency', 'is_active']
     search_fields = ['name']
 
+    @action(detail=True, methods=['post'], url_path='generate')
+    def generate(self, request, pk=None):
+        """Bulk-generate a StudentFee for every active student who doesn't already have one."""
+        from apps.students.models import Student
+        import datetime
+
+        structure = self.get_object()
+        due_date_str = request.data.get('due_date')
+        if not due_date_str:
+            return Response({'detail': 'due_date is required (YYYY-MM-DD)'}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            due_date = datetime.date.fromisoformat(due_date_str)
+        except ValueError:
+            return Response({'detail': 'Invalid date format'}, status=status.HTTP_400_BAD_REQUEST)
+
+        students = Student.objects.filter(is_active=True)
+        created, skipped = 0, 0
+        for student in students:
+            exists = StudentFee.objects.filter(student=student, fee_structure=structure, due_date=due_date).exists()
+            if not exists:
+                StudentFee.objects.create(
+                    student=student,
+                    fee_structure=structure,
+                    due_date=due_date,
+                    amount=structure.amount,
+                    discount_amount=0,
+                    status=StudentFee.Status.PENDING,
+                )
+                created += 1
+            else:
+                skipped += 1
+
+        return Response({'created': created, 'skipped': skipped,
+                         'detail': f'Generated {created} fee records. {skipped} already existed.'})
+
 
 class PromoCodeViewSet(viewsets.ModelViewSet):
     queryset = PromoCode.objects.all()

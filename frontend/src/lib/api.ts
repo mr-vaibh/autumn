@@ -201,6 +201,12 @@ export const attendanceApi = {
 export const feesApi = {
   getStructures: () =>
     api.get("/fees/structures/"),
+  createStructure: (data: Record<string, unknown>) =>
+    api.post("/fees/structures/", data),
+  deleteStructure: (id: number) =>
+    api.delete(`/fees/structures/${id}/`),
+  generateFees: (structureId: number, due_date: string) =>
+    api.post(`/fees/structures/${structureId}/generate/`, { due_date }),
   getStudentFees: (params?: Record<string, unknown>) =>
     api.get("/fees/student-fees/", { params }),
   createOrder: (student_fee_id: number) =>
