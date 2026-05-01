@@ -87,8 +87,6 @@ export default function LoginPage() {
       setOtpEmail(data.email);
       setOtpSent(true);
       toast.success("OTP sent! Check your phone/email.");
-      if (resp.data.debug_otp) {
-        toast(`Debug OTP: ${resp.data.debug_otp}`, { duration: 10000 });
       }
     } catch (error: unknown) {
       const axiosError = error as { response?: { data?: { detail?: string } } };
