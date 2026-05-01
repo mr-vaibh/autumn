@@ -73,7 +73,7 @@ export default function StudentDetailPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="w-8 h-8 border-4 border-purple-400 border-t-transparent rounded-full animate-spin"></div>
+        <div className="w-8 h-8 border-4 border-neutral-300 border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
   }
@@ -81,7 +81,7 @@ export default function StudentDetailPage() {
   if (!student) return <div>Student not found</div>;
 
   const levelColors: Record<string, string> = {
-    Level1: "bg-purple-100 text-purple-800",
+    Level1: "bg-neutral-100 text-neutral-800",
     Level2: "bg-yellow-100 text-yellow-800",
     Level3: "bg-red-100 text-red-800",
   };
@@ -100,7 +100,7 @@ export default function StudentDetailPage() {
       <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-6">
-            <div className="w-20 h-20 bg-purple-100 rounded-2xl flex items-center justify-center text-3xl font-bold text-purple-700">
+            <div className="w-20 h-20 bg-neutral-100 rounded-2xl flex items-center justify-center text-3xl font-bold text-neutral-800">
               {student.name.charAt(0)}
             </div>
             <div>
@@ -114,7 +114,7 @@ export default function StudentDetailPage() {
                 </span>
               </div>
               <div className="flex items-center gap-4 text-sm text-gray-500">
-                <span className="font-mono text-purple-600 font-semibold">{student.student_id}</span>
+                <span className="font-mono text-neutral-800 font-semibold">{student.student_id}</span>
                 <span>•</span>
                 <span>{student.age} years old</span>
                 <span>•</span>
@@ -124,7 +124,7 @@ export default function StudentDetailPage() {
               </div>
             </div>
           </div>
-          <Button size="sm" className="gap-2 bg-purple-600 hover:bg-purple-700">
+          <Button size="sm" className="gap-2 bg-black hover:bg-neutral-800 text-white">
             <Edit className="w-4 h-4" />
             Edit Profile
           </Button>
@@ -145,14 +145,14 @@ export default function StudentDetailPage() {
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
               <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                <Activity className="w-4 h-4 text-purple-600" />
+                <Activity className="w-4 h-4 text-neutral-800" />
                 Diagnosis
               </h3>
               <p className="text-sm text-gray-600 leading-relaxed">{student.diagnosis || "No diagnosis information available"}</p>
             </div>
             <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
               <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-blue-600" />
+                <Calendar className="w-4 h-4 text-neutral-700" />
                 Enrollment Details
               </h3>
               <div className="space-y-2 text-sm">
@@ -217,7 +217,7 @@ export default function StudentDetailPage() {
             {student.parents.map((parent) => (
               <div key={parent.id} className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-blue-700 font-bold text-lg">
+                  <div className="w-12 h-12 bg-neutral-100 rounded-full flex items-center justify-center text-neutral-700 font-bold text-lg">
                     {parent.parent_name.charAt(0)}
                   </div>
                   <div>
@@ -247,7 +247,7 @@ export default function StudentDetailPage() {
           <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-semibold text-gray-900">Documents</h3>
-              <Button size="sm" className="gap-2 bg-purple-600 hover:bg-purple-700">
+              <Button size="sm" className="gap-2 bg-black hover:bg-neutral-800 text-white">
                 <FileText className="w-4 h-4" />
                 Upload Document
               </Button>

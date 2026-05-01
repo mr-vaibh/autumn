@@ -30,8 +30,8 @@ const milestones = [
 ];
 
 const typeColors: Record<string, string> = {
-  speech: "bg-purple-100 text-purple-700 border-purple-200",
-  ot: "bg-blue-100 text-blue-700 border-blue-200",
+  speech: "bg-neutral-100 text-neutral-800 border-neutral-300",
+  ot: "bg-neutral-100 text-neutral-700 border-neutral-300",
   sensory: "bg-green-100 text-green-700 border-green-200",
 };
 
@@ -44,7 +44,7 @@ export default function ParentProgressPage() {
       </div>
 
       {/* Overall Score */}
-      <div className="bg-gradient-to-r from-purple-600 to-blue-600 rounded-2xl p-6 text-white">
+      <div className="bg-black rounded-2xl p-6 text-white">
         <div className="grid grid-cols-3 gap-6 text-center">
           {[
             { label: "Overall Progress", value: "4.2/5", sub: "This month" },
@@ -53,8 +53,8 @@ export default function ParentProgressPage() {
           ].map((stat, idx) => (
             <div key={idx}>
               <p className="text-3xl font-bold">{stat.value}</p>
-              <p className="text-purple-200 text-sm mt-1">{stat.label}</p>
-              <p className="text-purple-300 text-xs">{stat.sub}</p>
+              <p className="text-neutral-800 text-sm mt-1">{stat.label}</p>
+              <p className="text-neutral-800 text-xs">{stat.sub}</p>
             </div>
           ))}
         </div>
@@ -91,7 +91,7 @@ export default function ParentProgressPage() {
                 </div>
                 <div className="relative w-full bg-gray-100 rounded-full h-2.5">
                   <div
-                    className="absolute left-0 top-0 h-2.5 bg-purple-500 rounded-full transition-all"
+                    className="absolute left-0 top-0 h-2.5 bg-neutral-100 rounded-full transition-all"
                     style={{ width: `${skill.current}%` }}
                   ></div>
                   <div

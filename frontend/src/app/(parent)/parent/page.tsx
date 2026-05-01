@@ -11,7 +11,7 @@ const childInfo = {
   name: "Arjun Kumar",
   studentId: "GALS20240001",
   level: "Level 1",
-  teacher: "Priya Singh",
+  teacher: "Priya S.",
 };
 
 const recentSessions = [
@@ -21,7 +21,7 @@ const recentSessions = [
 ];
 
 const todaySchedule = [
-  { time: "9:00 AM", subject: "Speech Therapy", teacher: "Ms. Priya Singh" },
+  { time: "9:00 AM", subject: "Speech Therapy", teacher: "Ms. Priya S." },
   { time: "11:00 AM", subject: "OT Session", teacher: "Dr. Rahul Kumar" },
   { time: "2:00 PM", subject: "Sensory Integration", teacher: "Ms. Anita" },
 ];
@@ -56,14 +56,14 @@ export default function ParentDashboard() {
       </div>
 
       {/* Child Info Banner */}
-      <div className="bg-gradient-to-r from-purple-600 to-blue-600 rounded-2xl p-6 text-white">
+      <div className="bg-black rounded-2xl p-6 text-white">
         <div className="flex items-center gap-6">
           <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center text-3xl font-bold">
             {childInfo.name.charAt(0)}
           </div>
           <div>
             <h2 className="text-xl font-bold">{childInfo.name}</h2>
-            <div className="flex items-center gap-3 mt-1 text-purple-200 text-sm">
+            <div className="flex items-center gap-3 mt-1 text-neutral-800 text-sm">
               <span className="font-mono">{childInfo.studentId}</span>
               <span>•</span>
               <span>{childInfo.level}</span>
@@ -102,14 +102,14 @@ export default function ParentDashboard() {
         {/* Today's Schedule */}
         <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
           <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-            <Calendar className="w-5 h-5 text-purple-600" />
+            <Calendar className="w-5 h-5 text-neutral-800" />
             Today&apos;s Sessions
           </h3>
           <div className="space-y-3">
             {todaySchedule.map((item, idx) => (
-              <div key={idx} className="flex items-center gap-4 p-3 bg-purple-50 rounded-lg">
+              <div key={idx} className="flex items-center gap-4 p-3 bg-neutral-100 rounded-lg">
                 <div className="text-center w-16 flex-shrink-0">
-                  <p className="text-xs font-bold text-purple-700">{item.time}</p>
+                  <p className="text-xs font-bold text-neutral-800">{item.time}</p>
                 </div>
                 <div>
                   <p className="font-semibold text-gray-900 text-sm">{item.subject}</p>
@@ -123,7 +123,7 @@ export default function ParentDashboard() {
         {/* Recent Reports */}
         <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
           <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-            <FileText className="w-5 h-5 text-blue-500" />
+            <FileText className="w-5 h-5 text-neutral-700" />
             Recent Session Reports
           </h3>
           <div className="space-y-4">
@@ -151,11 +151,11 @@ export default function ParentDashboard() {
           {notifications.map((notif) => (
             <div key={notif.id} className={`flex items-start gap-3 p-3 rounded-lg ${
               notif.type === "warning" ? "bg-yellow-50" :
-              notif.type === "success" ? "bg-green-50" : "bg-blue-50"
+              notif.type === "success" ? "bg-green-50" : "bg-neutral-100"
             }`}>
               <div className={`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${
                 notif.type === "warning" ? "bg-yellow-500" :
-                notif.type === "success" ? "bg-green-500" : "bg-blue-500"
+                notif.type === "success" ? "bg-green-500" : "bg-neutral-100"
               }`}></div>
               <div>
                 <p className="text-sm text-gray-700">{notif.message}</p>

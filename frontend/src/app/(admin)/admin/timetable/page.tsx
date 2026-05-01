@@ -1,10 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { timetableApi } from "@/lib/api";
+import { timetableApi, classesApi } from "@/lib/api";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Plus, Clock, User } from "lucide-react";
+import toast from "react-hot-toast";
 
 interface Period {
   id: number;
@@ -25,11 +29,11 @@ interface Period {
 const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
 const mockPeriods: Period[] = [
-  { id: 1, name: "Speech Therapy", subject: "Speech Therapy", teacher_name: "Priya Singh", class_name: "Level 1 - A", section_name: "Morning", day_of_week: 0, day_name: "Monday", start_time: "09:00", end_time: "10:00", color: "#7C3AED", room: "Room 1", is_active: true },
+  { id: 1, name: "Speech Therapy", subject: "Speech Therapy", teacher_name: "Priya S.", class_name: "Level 1 - A", section_name: "Morning", day_of_week: 0, day_name: "Monday", start_time: "09:00", end_time: "10:00", color: "#7C3AED", room: "Room 1", is_active: true },
   { id: 2, name: "Occupational Therapy", subject: "OT", teacher_name: "Rahul Kumar", class_name: "Level 2 - A", section_name: "Morning", day_of_week: 0, day_name: "Monday", start_time: "10:00", end_time: "11:00", color: "#2563EB", room: "OT Room", is_active: true },
   { id: 3, name: "Sensory Integration", subject: "Sensory", teacher_name: "Anita Sharma", class_name: "Level 1 - A", section_name: "Morning", day_of_week: 1, day_name: "Tuesday", start_time: "09:00", end_time: "10:00", color: "#059669", room: "Sensory Room", is_active: true },
   { id: 4, name: "ABA Therapy", subject: "ABA", teacher_name: "Vijay Nair", class_name: "Level 2 - A", section_name: "Morning", day_of_week: 1, day_name: "Tuesday", start_time: "10:00", end_time: "11:30", color: "#DC2626", room: "ABA Room", is_active: true },
-  { id: 5, name: "Art Therapy", subject: "Art", teacher_name: "Priya Singh", class_name: "Level 1 - A", section_name: "Afternoon", day_of_week: 2, day_name: "Wednesday", start_time: "14:00", end_time: "15:00", color: "#F59E0B", room: "Art Room", is_active: true },
+  { id: 5, name: "Art Therapy", subject: "Art", teacher_name: "Priya S.", class_name: "Level 1 - A", section_name: "Afternoon", day_of_week: 2, day_name: "Wednesday", start_time: "14:00", end_time: "15:00", color: "#F59E0B", room: "Art Room", is_active: true },
   { id: 6, name: "Music Therapy", subject: "Music", teacher_name: "Rahul Kumar", class_name: "Level 3 - A", section_name: "Morning", day_of_week: 3, day_name: "Thursday", start_time: "09:30", end_time: "10:30", color: "#8B5CF6", room: "Music Room", is_active: true },
   { id: 7, name: "Physical Therapy", subject: "PT", teacher_name: "Anita Sharma", class_name: "Level 2 - A", section_name: "Morning", day_of_week: 4, day_name: "Friday", start_time: "11:00", end_time: "12:00", color: "#14B8A6", room: "Gym", is_active: true },
 ];
@@ -38,13 +42,35 @@ export default function TimetablePage() {
   const [periods, setPeriods] = useState<Period[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedDay, setSelectedDay] = useState<number | null>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [availableClasses, setAvailableClasses] = useState<{ id: number; name: string }[]>([]);
+  const [newPeriod, setNewPeriod] = useState({
+    name: "",
+    subject: "",
+    class_ref: "" as string | number,
+    day_of_week: 0,
+    start_time: "09:00",
+    end_time: "10:00",
+    room: "",
+  });
 
   useEffect(() => {
     timetableApi.getPeriods()
       .then((res) => setPeriods(res.data.results || res.data))
       .catch(() => setPeriods(mockPeriods))
       .finally(() => setLoading(false));
+    classesApi.getAll()
+      .then((res) => setAvailableClasses(res.data.results || res.data))
+      .catch(() => {});
   }, []);
+
+  const fetchPeriods = () => {
+    setLoading(true);
+    timetableApi.getPeriods()
+      .then((res) => setPeriods(res.data.results || res.data))
+      .catch(() => setPeriods(mockPeriods))
+      .finally(() => setLoading(false));
+  };
 
   const getPeriodsByDay = (day: number) => periods.filter((p) => p.day_of_week === day);
 
@@ -55,11 +81,91 @@ export default function TimetablePage() {
           <h1 className="text-2xl font-bold text-gray-900">Timetable</h1>
           <p className="text-sm text-gray-500 mt-0.5">Weekly schedule overview</p>
         </div>
-        <Button size="sm" className="gap-2 bg-purple-600 hover:bg-purple-700">
+        <Button size="sm" className="gap-2 bg-black hover:bg-neutral-800 text-white" onClick={() => setDialogOpen(true)}>
           <Plus className="w-4 h-4" />
           Add Period
         </Button>
       </div>
+
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Add Period</DialogTitle>
+          </DialogHeader>
+          <form
+            onSubmit={async (e) => {
+              e.preventDefault();
+              if (!newPeriod.class_ref) { toast.error("Please select a class"); return; }
+              try {
+                await timetableApi.createPeriod({ ...newPeriod, class_ref: Number(newPeriod.class_ref) });
+                toast.success("Period added");
+                setDialogOpen(false);
+                setNewPeriod({ name: "", subject: "", class_ref: "", day_of_week: 0, start_time: "09:00", end_time: "10:00", room: "" });
+                fetchPeriods();
+              } catch (err: unknown) {
+                const e = err as { response?: { data?: Record<string, string[]> } };
+                const msg = e.response?.data ? Object.values(e.response.data).flat()[0] : "Failed to add period";
+                toast.error(msg as string);
+              }
+            }}
+            className="space-y-4"
+          >
+            <div className="space-y-2">
+              <Label htmlFor="period-name">Name *</Label>
+              <Input id="period-name" required value={newPeriod.name} onChange={(e) => setNewPeriod({ ...newPeriod, name: e.target.value })} placeholder="e.g. Speech Therapy" />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="period-subject">Subject *</Label>
+              <Input id="period-subject" required value={newPeriod.subject} onChange={(e) => setNewPeriod({ ...newPeriod, subject: e.target.value })} placeholder="e.g. Speech Therapy" />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="period-class">Class *</Label>
+              <select
+                id="period-class"
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                value={newPeriod.class_ref}
+                onChange={(e) => setNewPeriod({ ...newPeriod, class_ref: e.target.value })}
+              >
+                <option value="">Select a class</option>
+                {availableClasses.map((c) => (
+                  <option key={c.id} value={c.id}>{c.name}</option>
+                ))}
+              </select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="period-day">Day of Week</Label>
+              <select
+                id="period-day"
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                value={newPeriod.day_of_week}
+                onChange={(e) => setNewPeriod({ ...newPeriod, day_of_week: Number(e.target.value) })}
+              >
+                {DAYS.map((day, idx) => (
+                  <option key={idx} value={idx}>{day}</option>
+                ))}
+              </select>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="period-start">Start Time</Label>
+                <Input id="period-start" type="time" required value={newPeriod.start_time} onChange={(e) => setNewPeriod({ ...newPeriod, start_time: e.target.value })} />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="period-end">End Time</Label>
+                <Input id="period-end" type="time" required value={newPeriod.end_time} onChange={(e) => setNewPeriod({ ...newPeriod, end_time: e.target.value })} />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="period-room">Room (optional)</Label>
+              <Input id="period-room" value={newPeriod.room} onChange={(e) => setNewPeriod({ ...newPeriod, room: e.target.value })} />
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>Cancel</Button>
+              <Button type="submit" className="bg-black text-white hover:bg-neutral-800">Add</Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
 
       {/* Day Filter */}
       <div className="flex gap-2 flex-wrap">
@@ -67,7 +173,7 @@ export default function TimetablePage() {
           onClick={() => setSelectedDay(null)}
           className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
             selectedDay === null
-              ? "bg-purple-600 text-white"
+              ? "bg-black text-white"
               : "bg-white text-gray-600 border border-gray-200 hover:bg-gray-50"
           }`}
         >
@@ -79,7 +185,7 @@ export default function TimetablePage() {
             onClick={() => setSelectedDay(idx)}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
               selectedDay === idx
-                ? "bg-purple-600 text-white"
+                ? "bg-black text-white"
                 : "bg-white text-gray-600 border border-gray-200 hover:bg-gray-50"
             }`}
           >
@@ -91,7 +197,7 @@ export default function TimetablePage() {
       {/* Timetable Grid */}
       {loading ? (
         <div className="flex justify-center py-12">
-          <div className="w-8 h-8 border-4 border-purple-400 border-t-transparent rounded-full animate-spin"></div>
+          <div className="w-8 h-8 border-4 border-neutral-300 border-t-transparent rounded-full animate-spin"></div>
         </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-5">
@@ -100,7 +206,7 @@ export default function TimetablePage() {
             const dayPeriods = getPeriodsByDay(idx);
             return (
               <div key={idx} className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
-                <div className="bg-gradient-to-r from-gray-700 to-gray-800 px-4 py-3 flex items-center justify-between">
+                <div className="bg-neutral-900 px-4 py-3 flex items-center justify-between">
                   <h3 className="font-semibold text-white text-sm">{day}</h3>
                   <span className="text-gray-400 text-xs">{dayPeriods.length} periods</span>
                 </div>

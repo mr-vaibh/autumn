@@ -21,10 +21,10 @@ interface SessionReport {
 }
 
 const mockSessions: SessionReport[] = [
-  { id: 1, period_subject: "Speech Therapy", class_name: "Level 1 - A", date: "2024-05-22", status: "completed", improvement_level: 4, teacher_name: "Priya Singh", activity_done: "Practiced consonant sounds with picture cards. Used repetition and visual cues.", student_response: "Arjun responded positively. Successfully pronounced 8 out of 10 target words.", behavior_notes: "Good behavior throughout. Sat focused for full 45 minutes.", general_notes: "Significant improvement from last week. Continue with consonant blend exercises." },
+  { id: 1, period_subject: "Speech Therapy", class_name: "Level 1 - A", date: "2024-05-22", status: "completed", improvement_level: 4, teacher_name: "Priya S.", activity_done: "Practiced consonant sounds with picture cards. Used repetition and visual cues.", student_response: "Arjun responded positively. Successfully pronounced 8 out of 10 target words.", behavior_notes: "Good behavior throughout. Sat focused for full 45 minutes.", general_notes: "Significant improvement from last week. Continue with consonant blend exercises." },
   { id: 2, period_subject: "Occupational Therapy", class_name: "Level 1 - A", date: "2024-05-20", status: "completed", improvement_level: 3, teacher_name: "Rahul Kumar", activity_done: "Fine motor exercises: Threading beads, playdough activities, scissor work.", student_response: "Needed some assistance with scissor grip but completed all tasks with moderate support.", behavior_notes: "Some hyperactivity noted. Took short sensory break which helped.", general_notes: "Continue fine motor exercises. Introduce bilateral coordination activities next week." },
   { id: 3, period_subject: "Sensory Integration", class_name: "Level 1 - A", date: "2024-05-19", status: "completed", improvement_level: 5, teacher_name: "Anita Sharma", activity_done: "Sensory bin activities, swing therapy, tactile stimulation.", student_response: "Excellent engagement! Arjun sought out the sensory activities independently.", behavior_notes: "Very calm and focused after sensory activities. No challenging behaviors.", general_notes: "Best session this month! He is responding very well to sensory diet." },
-  { id: 4, period_subject: "Speech Therapy", class_name: "Level 1 - A", date: "2024-05-17", status: "skipped", improvement_level: null, teacher_name: "Priya Singh", general_notes: "Session skipped due to student absence." },
+  { id: 4, period_subject: "Speech Therapy", class_name: "Level 1 - A", date: "2024-05-17", status: "skipped", improvement_level: null, teacher_name: "Priya S.", general_notes: "Session skipped due to student absence." },
 ];
 
 function StarRating({ rating }: { rating: number | null }) {
@@ -67,7 +67,7 @@ export default function ParentSessionsPage() {
 
       {loading ? (
         <div className="flex justify-center py-12">
-          <div className="w-8 h-8 border-4 border-purple-400 border-t-transparent rounded-full animate-spin"></div>
+          <div className="w-8 h-8 border-4 border-neutral-300 border-t-transparent rounded-full animate-spin"></div>
         </div>
       ) : (
         <div className="space-y-3">
@@ -120,8 +120,8 @@ export default function ParentSessionsPage() {
                     </div>
                   )}
                   {session.general_notes && (
-                    <div className="bg-purple-50 rounded-lg p-3 border border-purple-100">
-                      <p className="text-xs font-semibold text-purple-600 uppercase tracking-wider mb-1.5">Therapist Notes</p>
+                    <div className="bg-neutral-100 rounded-lg p-3 border border-neutral-300">
+                      <p className="text-xs font-semibold text-neutral-800 uppercase tracking-wider mb-1.5">Therapist Notes</p>
                       <p className="text-sm text-gray-700 leading-relaxed">{session.general_notes}</p>
                     </div>
                   )}

@@ -92,7 +92,7 @@ export function DataTable<T extends Record<string, unknown>>({
               <tr>
                 <td colSpan={columns.length + (actions ? 1 : 0)} className="px-4 py-8 text-center">
                   <div className="flex items-center justify-center gap-2 text-gray-400">
-                    <div className="w-5 h-5 border-2 border-purple-400 border-t-transparent rounded-full animate-spin"></div>
+                    <div className="w-5 h-5 border-2 border-neutral-300 border-t-neutral-800 rounded-full animate-spin"></div>
                     <span>Loading...</span>
                   </div>
                 </td>

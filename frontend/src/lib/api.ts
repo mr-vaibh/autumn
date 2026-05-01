@@ -216,6 +216,10 @@ export const communicationApi = {
     api.get("/communication/announcements/", { params }),
   createAnnouncement: (data: Record<string, unknown>) =>
     api.post("/communication/announcements/", data),
+  updateAnnouncement: (id: number, data: Record<string, unknown>) =>
+    api.patch(`/communication/announcements/${id}/`, data),
+  deleteAnnouncement: (id: number) =>
+    api.delete(`/communication/announcements/${id}/`),
   getMessages: () =>
     api.get("/communication/messages/"),
   getThreads: () =>

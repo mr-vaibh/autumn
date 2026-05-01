@@ -5,9 +5,13 @@ import { feesApi } from "@/lib/api";
 import { DataTable } from "@/components/shared/DataTable";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { StatsCard } from "@/components/shared/StatsCard";
 import { CreditCard, TrendingUp, AlertTriangle, CheckCircle } from "lucide-react";
 import { formatDate, formatCurrency } from "@/lib/utils";
+import toast from "react-hot-toast";
 
 interface StudentFee {
   id: number;
@@ -23,7 +27,7 @@ interface StudentFee {
 
 const mockFees: StudentFee[] = [
   { id: 1, student_name: "Arjun Kumar", student_id_display: "GALS20240001", fee_structure_name: "Monthly Therapy Fee", due_date: "2024-05-01", amount: 8500, discount_amount: 0, net_amount: 8500, status: "paid" },
-  { id: 2, student_name: "Priya Sharma", student_id_display: "GALS20240002", fee_structure_name: "Monthly Therapy Fee", due_date: "2024-05-01", amount: 8500, discount_amount: 500, net_amount: 8000, status: "pending" },
+  { id: 2, student_name: "Hridhya Shukla", student_id_display: "GALS20240002", fee_structure_name: "Monthly Therapy Fee", due_date: "2024-05-01", amount: 8500, discount_amount: 500, net_amount: 8000, status: "pending" },
   { id: 3, student_name: "Rohan Mehta", student_id_display: "GALS20240003", fee_structure_name: "Monthly Therapy Fee", due_date: "2024-04-01", amount: 8500, discount_amount: 0, net_amount: 8500, status: "overdue" },
   { id: 4, student_name: "Sneha Patel", student_id_display: "GALS20240004", fee_structure_name: "Annual Admission Fee", due_date: "2024-04-15", amount: 25000, discount_amount: 2500, net_amount: 22500, status: "paid" },
   { id: 5, student_name: "Vikram Singh", student_id_display: "GALS20240005", fee_structure_name: "Monthly Therapy Fee", due_date: "2024-05-01", amount: 8500, discount_amount: 0, net_amount: 8500, status: "pending" },
@@ -41,6 +45,14 @@ export default function FeesPage() {
   const [fees, setFees] = useState<StudentFee[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState<string>("all");
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [newFee, setNewFee] = useState({
+    student_name: "",
+    fee_structure_name: "",
+    amount: 0,
+    due_date: "",
+    discount_amount: 0,
+  });
 
   useEffect(() => {
     feesApi.getStudentFees()
@@ -110,11 +122,66 @@ export default function FeesPage() {
           <h1 className="text-2xl font-bold text-gray-900">Fee Management</h1>
           <p className="text-sm text-gray-500 mt-0.5">Track payments and outstanding dues</p>
         </div>
-        <Button size="sm" className="gap-2 bg-purple-600 hover:bg-purple-700">
+        <Button size="sm" className="gap-2 bg-black hover:bg-neutral-800 text-white" onClick={() => setDialogOpen(true)}>
           <CreditCard className="w-4 h-4" />
           Create Fee Record
         </Button>
       </div>
+
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Create Fee Record</DialogTitle>
+          </DialogHeader>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              const netAmount = newFee.amount - newFee.discount_amount;
+              const record: StudentFee = {
+                id: Date.now(),
+                student_name: newFee.student_name,
+                student_id_display: `GALS${Date.now()}`,
+                fee_structure_name: newFee.fee_structure_name,
+                due_date: newFee.due_date,
+                amount: newFee.amount,
+                discount_amount: newFee.discount_amount,
+                net_amount: netAmount,
+                status: "pending",
+              };
+              setFees((prev) => [record, ...prev]);
+              toast.success("Fee record created");
+              setDialogOpen(false);
+              setNewFee({ student_name: "", fee_structure_name: "", amount: 0, due_date: "", discount_amount: 0 });
+            }}
+            className="space-y-4"
+          >
+            <div className="space-y-2">
+              <Label htmlFor="student_name">Student Name</Label>
+              <Input id="student_name" required value={newFee.student_name} onChange={(e) => setNewFee({ ...newFee, student_name: e.target.value })} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="fee_structure_name">Fee Structure Name</Label>
+              <Input id="fee_structure_name" required value={newFee.fee_structure_name} onChange={(e) => setNewFee({ ...newFee, fee_structure_name: e.target.value })} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="amount">Amount</Label>
+              <Input id="amount" type="number" required min={0} value={newFee.amount} onChange={(e) => setNewFee({ ...newFee, amount: Number(e.target.value) })} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="due_date">Due Date</Label>
+              <Input id="due_date" type="date" required value={newFee.due_date} onChange={(e) => setNewFee({ ...newFee, due_date: e.target.value })} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="discount_amount">Discount Amount</Label>
+              <Input id="discount_amount" type="number" min={0} value={newFee.discount_amount} onChange={(e) => setNewFee({ ...newFee, discount_amount: Number(e.target.value) })} />
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>Cancel</Button>
+              <Button type="submit" className="bg-black text-white hover:bg-neutral-800">Create</Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
         <StatsCard
@@ -153,7 +220,7 @@ export default function FeesPage() {
             onClick={() => setActiveFilter(filter.key)}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
               activeFilter === filter.key
-                ? "bg-purple-600 text-white"
+                ? "bg-black text-white"
                 : "bg-white text-gray-600 border border-gray-200 hover:bg-gray-50"
             }`}
           >

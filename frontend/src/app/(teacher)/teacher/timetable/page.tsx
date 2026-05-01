@@ -59,8 +59,8 @@ export default function TeacherTimetablePage() {
               onClick={() => setSelectedDay(idx)}
               className={`flex-shrink-0 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
                 selectedDay === idx
-                  ? "bg-purple-600 text-white shadow-sm"
-                  : "bg-white text-gray-600 border border-gray-200 hover:border-purple-300"
+                  ? "bg-neutral-100 text-white shadow-sm"
+                  : "bg-white text-gray-600 border border-gray-200 hover:border-neutral-300"
               }`}
             >
               <div className="flex items-center gap-2">
@@ -68,7 +68,7 @@ export default function TeacherTimetablePage() {
                 {isToday && <span className="w-1.5 h-1.5 bg-current rounded-full"></span>}
               </div>
               {count > 0 && (
-                <p className={`text-xs mt-0.5 ${selectedDay === idx ? "text-purple-200" : "text-gray-400"}`}>
+                <p className={`text-xs mt-0.5 ${selectedDay === idx ? "text-neutral-800" : "text-gray-400"}`}>
                   {count} period{count !== 1 ? "s" : ""}
                 </p>
               )}
@@ -80,7 +80,7 @@ export default function TeacherTimetablePage() {
       {/* Periods */}
       {loading ? (
         <div className="flex justify-center py-12">
-          <div className="w-8 h-8 border-4 border-purple-400 border-t-transparent rounded-full animate-spin"></div>
+          <div className="w-8 h-8 border-4 border-neutral-300 border-t-transparent rounded-full animate-spin"></div>
         </div>
       ) : dayPeriods.length === 0 ? (
         <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-12 text-center">
@@ -122,7 +122,7 @@ export default function TeacherTimetablePage() {
 
               {/* Actions */}
               <div className="flex gap-2 flex-shrink-0">
-                <button className="bg-purple-600 hover:bg-purple-700 text-white text-xs px-4 py-2 rounded-lg font-medium transition-colors">
+                <button className="bg-black hover:bg-neutral-800 text-white text-white text-xs px-4 py-2 rounded-lg font-medium transition-colors">
                   Write Report
                 </button>
               </div>

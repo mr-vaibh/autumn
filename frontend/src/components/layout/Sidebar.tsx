@@ -7,9 +7,9 @@ import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import {
   LayoutDashboard, Users, GraduationCap, Calendar, FileText,
-  ClipboardCheck, CreditCard, MessageSquare, BarChart3,
-  Utensils, ChevronLeft, ChevronRight, LogOut, Settings,
-  BookOpen, UserCheck, School, Bell
+  CreditCard, MessageSquare, BarChart3,
+  ChevronLeft, ChevronRight, LogOut,
+  UserCheck, School
 } from "lucide-react";
 
 interface NavItem {
@@ -62,19 +62,19 @@ export function Sidebar() {
   return (
     <aside
       className={cn(
-        "flex flex-col bg-gradient-to-b from-purple-950 to-purple-900 text-white transition-all duration-300 ease-in-out min-h-screen",
+        "flex flex-col bg-neutral-950 text-white transition-all duration-300 ease-in-out min-h-screen",
         collapsed ? "w-16" : "w-64"
       )}
     >
       {/* Logo */}
-      <div className={cn("flex items-center border-b border-purple-700/50 p-4", collapsed ? "justify-center" : "gap-3")}>
-        <div className="w-10 h-10 bg-purple-600/50 rounded-xl flex items-center justify-center flex-shrink-0 text-xl">
-          🌟
+      <div className={cn("flex items-center border-b border-neutral-800 p-4", collapsed ? "justify-center" : "gap-3")}>
+        <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center flex-shrink-0 text-sm font-bold text-black">
+          GA
         </div>
         {!collapsed && (
           <div className="overflow-hidden">
-            <p className="text-xs font-bold text-white leading-tight">GLOBAL AUTISM</p>
-            <p className="text-xs text-purple-300">Learning School</p>
+            <p className="text-sm font-semibold text-white leading-tight">Global Autism</p>
+            <p className="text-xs text-neutral-500">Learning School</p>
           </div>
         )}
       </div>
@@ -89,7 +89,7 @@ export function Sidebar() {
               key={item.href}
               href={item.href}
               className={cn(
-                "sidebar-link text-purple-200",
+                "sidebar-link text-neutral-400",
                 isActive && "active",
                 collapsed && "justify-center px-2"
               )}
@@ -103,17 +103,17 @@ export function Sidebar() {
       </nav>
 
       {/* Bottom section */}
-      <div className="border-t border-purple-700/50 p-2 space-y-1">
+      <div className="border-t border-neutral-800 p-2 space-y-1">
         {!collapsed && user && (
           <div className="px-3 py-2 mb-2">
             <p className="text-xs font-semibold text-white truncate">{user.full_name}</p>
-            <p className="text-xs text-purple-300 capitalize">{user.role.toLowerCase()}</p>
+            <p className="text-xs text-neutral-500 capitalize">{user.role.toLowerCase()}</p>
           </div>
         )}
         <button
           onClick={logout}
           className={cn(
-            "w-full sidebar-link text-purple-300 hover:text-white hover:bg-red-600/30",
+            "w-full sidebar-link text-neutral-500 hover:text-white hover:bg-red-950",
             collapsed && "justify-center px-2"
           )}
           title={collapsed ? "Logout" : undefined}
@@ -124,7 +124,7 @@ export function Sidebar() {
         <button
           onClick={() => setCollapsed(!collapsed)}
           className={cn(
-            "w-full sidebar-link text-purple-300 hover:text-white",
+            "w-full sidebar-link text-neutral-500 hover:text-white",
             collapsed && "justify-center px-2"
           )}
           title={collapsed ? "Expand sidebar" : "Collapse sidebar"}

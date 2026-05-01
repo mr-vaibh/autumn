@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, Legend } from "recharts";
+import dynamic from "next/dynamic";
+const { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, Legend } = require("recharts");
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BarChart3, TrendingUp, Users, Calendar } from "lucide-react";
 
@@ -137,7 +138,7 @@ export default function ReportsPage() {
                     <span className="text-sm font-medium text-gray-700 w-20 flex-shrink-0">{item.therapy}</span>
                     <div className="flex-1 bg-gray-100 rounded-full h-2.5">
                       <div
-                        className="h-2.5 rounded-full bg-purple-500"
+                        className="h-2.5 rounded-full bg-neutral-100"
                         style={{ width: `${(item.avgProgress / 5) * 100}%` }}
                       ></div>
                     </div>

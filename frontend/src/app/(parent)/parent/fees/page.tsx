@@ -114,7 +114,7 @@ export default function ParentFeesPage() {
       {/* Fee List */}
       {loading ? (
         <div className="flex justify-center py-12">
-          <div className="w-8 h-8 border-4 border-purple-400 border-t-transparent rounded-full animate-spin"></div>
+          <div className="w-8 h-8 border-4 border-neutral-300 border-t-transparent rounded-full animate-spin"></div>
         </div>
       ) : (
         <div className="space-y-3">
@@ -146,7 +146,7 @@ export default function ParentFeesPage() {
                     <Button
                       onClick={() => handlePayment(fee)}
                       disabled={payingId === fee.id}
-                      className="bg-purple-600 hover:bg-purple-700 gap-2"
+                      className="bg-black hover:bg-neutral-800 text-white gap-2"
                       size="sm"
                     >
                       {payingId === fee.id ? (

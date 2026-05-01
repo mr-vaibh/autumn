@@ -13,6 +13,10 @@ while ! nc -z redis 6379; do
 done
 echo "Redis is up!"
 
+echo "Making migrations..."
+python manage.py makemigrations users --noinput
+python manage.py makemigrations --noinput
+
 echo "Running migrations..."
 python manage.py migrate --noinput
 

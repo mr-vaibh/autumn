@@ -17,7 +17,7 @@ interface Student {
 
 const mockStudents: Student[] = [
   { id: 1, name: "Arjun Kumar", student_id: "GALS20240001", status: "present" },
-  { id: 2, name: "Priya Sharma", student_id: "GALS20240002", status: "present" },
+  { id: 2, name: "Hridhya Shukla", student_id: "GALS20240002", status: "present" },
   { id: 3, name: "Rohan Mehta", student_id: "GALS20240003", status: "absent" },
   { id: 4, name: "Sneha Patel", student_id: "GALS20240004", status: "late" },
   { id: 5, name: "Vikram Singh", student_id: "GALS20240005", status: "present" },
@@ -28,7 +28,7 @@ const statusConfig = {
   present: { label: "Present", color: "bg-green-100 text-green-700 border-green-200", icon: CheckCircle, iconColor: "text-green-500" },
   absent: { label: "Absent", color: "bg-red-100 text-red-700 border-red-200", icon: XCircle, iconColor: "text-red-500" },
   late: { label: "Late", color: "bg-yellow-100 text-yellow-700 border-yellow-200", icon: Clock, iconColor: "text-yellow-500" },
-  leave: { label: "Leave", color: "bg-blue-100 text-blue-700 border-blue-200", icon: Clock, iconColor: "text-blue-500" },
+  leave: { label: "Leave", color: "bg-neutral-100 text-neutral-700 border-neutral-300", icon: Clock, iconColor: "text-neutral-700" },
 };
 
 export default function AttendancePage() {
@@ -84,12 +84,12 @@ export default function AttendancePage() {
             type="date"
             value={selectedDate}
             onChange={(e) => setSelectedDate(e.target.value)}
-            className="border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-400"
+            className="border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-neutral-400"
           />
           <Button
             onClick={saveAttendance}
             disabled={saving}
-            className={`gap-2 ${saved ? "bg-green-600 hover:bg-green-700" : "bg-purple-600 hover:bg-purple-700"}`}
+            className={`gap-2 ${saved ? "bg-green-600 hover:bg-green-700" : "bg-black hover:bg-neutral-800 text-white"}`}
             size="sm"
           >
             {saving ? (
@@ -137,7 +137,7 @@ export default function AttendancePage() {
             const StatusIcon = statusConfig[student.status].icon;
             return (
               <div key={student.id} className="flex items-center gap-4 p-4 hover:bg-gray-50 transition-colors">
-                <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center text-sm font-bold text-purple-700">
+                <div className="w-10 h-10 bg-neutral-100 rounded-full flex items-center justify-center text-sm font-bold text-neutral-800">
                   {student.name.charAt(0)}
                 </div>
                 <div className="flex-1 min-w-0">

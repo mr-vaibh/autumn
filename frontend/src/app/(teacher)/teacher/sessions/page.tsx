@@ -1,12 +1,16 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { sessionsApi } from "@/lib/api";
+import { sessionsApi, timetableApi } from "@/lib/api";
 import { DataTable } from "@/components/shared/DataTable";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Plus, Eye, Star } from "lucide-react";
 import { formatDate } from "@/lib/utils";
+import toast from "react-hot-toast";
 
 interface SessionReport {
   id: number;
@@ -19,11 +23,11 @@ interface SessionReport {
 }
 
 const mockSessions: SessionReport[] = [
-  { id: 1, period_subject: "Speech Therapy", class_name: "Level 1 - A", date: "2024-05-22", status: "completed", improvement_level: 4, teacher_name: "Priya Singh" },
-  { id: 2, period_subject: "OT Session", class_name: "Level 2 - A", date: "2024-05-22", status: "pending", improvement_level: null, teacher_name: "Priya Singh" },
-  { id: 3, period_subject: "Sensory Integration", class_name: "Level 1 - A", date: "2024-05-21", status: "completed", improvement_level: 3, teacher_name: "Priya Singh" },
-  { id: 4, period_subject: "Speech Therapy", class_name: "Level 3 - A", date: "2024-05-20", status: "skipped", improvement_level: null, teacher_name: "Priya Singh" },
-  { id: 5, period_subject: "ABA Therapy", class_name: "Level 2 - B", date: "2024-05-19", status: "completed", improvement_level: 5, teacher_name: "Priya Singh" },
+  { id: 1, period_subject: "Speech Therapy", class_name: "Level 1 - A", date: "2024-05-22", status: "completed", improvement_level: 4, teacher_name: "Priya S." },
+  { id: 2, period_subject: "OT Session", class_name: "Level 2 - A", date: "2024-05-22", status: "pending", improvement_level: null, teacher_name: "Priya S." },
+  { id: 3, period_subject: "Sensory Integration", class_name: "Level 1 - A", date: "2024-05-21", status: "completed", improvement_level: 3, teacher_name: "Priya S." },
+  { id: 4, period_subject: "Speech Therapy", class_name: "Level 3 - A", date: "2024-05-20", status: "skipped", improvement_level: null, teacher_name: "Priya S." },
+  { id: 5, period_subject: "ABA Therapy", class_name: "Level 2 - B", date: "2024-05-19", status: "completed", improvement_level: 5, teacher_name: "Priya S." },
 ];
 
 const statusBadge: Record<string, "success" | "warning" | "secondary"> = {
@@ -51,13 +55,31 @@ export default function SessionsPage() {
   const [sessions, setSessions] = useState<SessionReport[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all");
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [availablePeriods, setAvailablePeriods] = useState<{ id: number; name: string; subject: string; class_name: string }[]>([]);
+  const [newReport, setNewReport] = useState({
+    period: "" as string | number,
+    date: new Date().toISOString().split("T")[0],
+    status: "pending",
+  });
 
   useEffect(() => {
     sessionsApi.getAll()
       .then((res) => setSessions(res.data.results || res.data))
       .catch(() => setSessions(mockSessions))
       .finally(() => setLoading(false));
+    timetableApi.getPeriods()
+      .then((res) => setAvailablePeriods(res.data.results || res.data))
+      .catch(() => {});
   }, []);
+
+  const fetchSessions = () => {
+    setLoading(true);
+    sessionsApi.getAll()
+      .then((res) => setSessions(res.data.results || res.data))
+      .catch(() => setSessions(mockSessions))
+      .finally(() => setLoading(false));
+  };
 
   const filteredSessions = filter === "all" ? sessions : sessions.filter((s) => s.status === filter);
 
@@ -100,11 +122,73 @@ export default function SessionsPage() {
           <h1 className="text-2xl font-bold text-gray-900">Session Reports</h1>
           <p className="text-sm text-gray-500 mt-0.5">Document and track therapy sessions</p>
         </div>
-        <Button size="sm" className="gap-2 bg-purple-600 hover:bg-purple-700">
+        <Button size="sm" className="gap-2 bg-black hover:bg-neutral-800 text-white" onClick={() => setDialogOpen(true)}>
           <Plus className="w-4 h-4" />
           New Report
         </Button>
       </div>
+
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>New Report</DialogTitle>
+          </DialogHeader>
+          <form
+            onSubmit={async (e) => {
+              e.preventDefault();
+              if (!newReport.period) { toast.error("Please select a period"); return; }
+              try {
+                await sessionsApi.create({ ...newReport, period: Number(newReport.period) });
+                toast.success("Report created");
+                setDialogOpen(false);
+                setNewReport({ period: "", date: new Date().toISOString().split("T")[0], status: "pending" });
+                fetchSessions();
+              } catch (err: unknown) {
+                const e = err as { response?: { data?: Record<string, string[]> } };
+                const msg = e.response?.data ? Object.values(e.response.data).flat()[0] : "Failed to create report";
+                toast.error(msg as string);
+              }
+            }}
+            className="space-y-4"
+          >
+            <div className="space-y-2">
+              <Label htmlFor="report-period">Period *</Label>
+              <select
+                id="report-period"
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                value={newReport.period}
+                onChange={(e) => setNewReport({ ...newReport, period: e.target.value })}
+              >
+                <option value="">Select a period</option>
+                {availablePeriods.map((p) => (
+                  <option key={p.id} value={p.id}>{p.subject} — {p.class_name}</option>
+                ))}
+              </select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="report-date">Date *</Label>
+              <Input id="report-date" type="date" required value={newReport.date} onChange={(e) => setNewReport({ ...newReport, date: e.target.value })} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="report-status">Status</Label>
+              <select
+                id="report-status"
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                value={newReport.status}
+                onChange={(e) => setNewReport({ ...newReport, status: e.target.value })}
+              >
+                <option value="pending">Pending</option>
+                <option value="completed">Completed</option>
+                <option value="skipped">Skipped</option>
+              </select>
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>Cancel</Button>
+              <Button type="submit" className="bg-black text-white hover:bg-neutral-800">Create</Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
 
       {/* Filter */}
       <div className="flex gap-2">
@@ -113,7 +197,7 @@ export default function SessionsPage() {
             key={f}
             onClick={() => setFilter(f)}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-              filter === f ? "bg-purple-600 text-white" : "bg-white text-gray-600 border border-gray-200 hover:bg-gray-50"
+              filter === f ? "bg-black text-white" : "bg-white text-gray-600 border border-gray-200 hover:bg-gray-50"
             }`}
           >
             {f.charAt(0).toUpperCase() + f.slice(1)}
@@ -132,7 +216,7 @@ export default function SessionsPage() {
           actions={(row) => (
             <div className="flex items-center gap-2 justify-end">
               {(row as unknown as SessionReport).status === "pending" && (
-                <Button size="sm" className="bg-purple-600 hover:bg-purple-700 text-xs">
+                <Button size="sm" className="bg-black hover:bg-neutral-800 text-white text-xs">
                   Write Report
                 </Button>
               )}

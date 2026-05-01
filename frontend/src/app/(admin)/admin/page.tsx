@@ -4,31 +4,16 @@ import { useState, useEffect } from "react";
 import { reportsApi } from "@/lib/api";
 import { StatsCard } from "@/components/shared/StatsCard";
 import { Users, GraduationCap, CreditCard, UserCheck, TrendingUp, AlertTriangle, Calendar, BookOpen } from "lucide-react";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from "recharts";
+import dynamic from "next/dynamic";
 import { formatDate } from "@/lib/utils";
 
-const mockAttendanceData = [
-  { month: "Jan", present: 85, absent: 15 },
-  { month: "Feb", present: 88, absent: 12 },
-  { month: "Mar", present: 82, absent: 18 },
-  { month: "Apr", present: 91, absent: 9 },
-  { month: "May", present: 87, absent: 13 },
-  { month: "Jun", present: 94, absent: 6 },
-];
+const DashboardCharts = dynamic(() => import("./DashboardCharts"), { ssr: false, loading: () => <div className="h-64 bg-gray-50 rounded-xl animate-pulse" /> });
 
-const mockProgressData = [
-  { month: "Jan", avg: 3.2 },
-  { month: "Feb", avg: 3.4 },
-  { month: "Mar", avg: 3.1 },
-  { month: "Apr", avg: 3.6 },
-  { month: "May", avg: 3.8 },
-  { month: "Jun", avg: 4.1 },
-];
 
 const recentActivities = [
-  { id: 1, type: "session", text: "Session report submitted for Arjun Kumar - Speech Therapy", time: "10 min ago", color: "bg-purple-500" },
-  { id: 2, type: "payment", text: "Fee payment received - Priya Sharma (₹8,500)", time: "25 min ago", color: "bg-green-500" },
-  { id: 3, type: "attendance", text: "Attendance marked for Class Autism Level 2", time: "1 hr ago", color: "bg-blue-500" },
+  { id: 1, type: "session", text: "Session report submitted for Arjun Kumar - Speech Therapy", time: "10 min ago", color: "bg-neutral-100" },
+  { id: 2, type: "payment", text: "Fee payment received - Hridhya Shukla (₹8,500)", time: "25 min ago", color: "bg-green-500" },
+  { id: 3, type: "attendance", text: "Attendance marked for Class Autism Level 2", time: "1 hr ago", color: "bg-neutral-100" },
   { id: 4, type: "student", text: "New student enrolled - Rohan Mehta", time: "2 hrs ago", color: "bg-orange-500" },
   { id: 5, type: "alert", text: "3 students have overdue fees this month", time: "3 hrs ago", color: "bg-red-500" },
 ];
@@ -115,45 +100,7 @@ export default function AdminDashboard() {
       </div>
 
       {/* Charts Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-        {/* Attendance Chart */}
-        <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
-          <h3 className="font-semibold text-gray-900 mb-1">Monthly Attendance Trend</h3>
-          <p className="text-xs text-gray-400 mb-4">Student attendance over the last 6 months</p>
-          <ResponsiveContainer width="100%" height={220}>
-            <BarChart data={mockAttendanceData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-              <XAxis dataKey="month" tick={{ fontSize: 12 }} />
-              <YAxis tick={{ fontSize: 12 }} />
-              <Tooltip />
-              <Bar dataKey="present" fill="#7c3aed" radius={[4, 4, 0, 0]} name="Present" />
-              <Bar dataKey="absent" fill="#e9d5ff" radius={[4, 4, 0, 0]} name="Absent" />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-
-        {/* Progress Chart */}
-        <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
-          <h3 className="font-semibold text-gray-900 mb-1">Average Therapy Progress</h3>
-          <p className="text-xs text-gray-400 mb-4">Average improvement level (1-5 scale)</p>
-          <ResponsiveContainer width="100%" height={220}>
-            <LineChart data={mockProgressData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-              <XAxis dataKey="month" tick={{ fontSize: 12 }} />
-              <YAxis domain={[0, 5]} tick={{ fontSize: 12 }} />
-              <Tooltip />
-              <Line
-                type="monotone"
-                dataKey="avg"
-                stroke="#7c3aed"
-                strokeWidth={2}
-                dot={{ fill: "#7c3aed", r: 4 }}
-                name="Avg Progress"
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
-      </div>
+      <DashboardCharts />
 
       {/* Bottom Row */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
@@ -185,7 +132,7 @@ export default function AdminDashboard() {
               { time: "3:30 PM", activity: "Parent Meeting", teacher: "Admin" },
             ].map((item, idx) => (
               <div key={idx} className="flex items-start gap-3 text-sm">
-                <span className="text-xs text-purple-600 font-mono font-semibold w-16 flex-shrink-0 mt-0.5">{item.time}</span>
+                <span className="text-xs text-neutral-800 font-mono font-semibold w-16 flex-shrink-0 mt-0.5">{item.time}</span>
                 <div className="flex-1 min-w-0">
                   <p className="font-medium text-gray-800 text-xs leading-tight">{item.activity}</p>
                   <p className="text-gray-400 text-xs">{item.teacher}</p>

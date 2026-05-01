@@ -10,7 +10,7 @@ import toast from "react-hot-toast";
 const mockThreads = [
   {
     id: "thread-1",
-    teacher: { id: 1, name: "Priya Singh", role: "TEACHER", subject: "Speech Therapist" },
+    teacher: { id: 1, name: "Priya S.", role: "TEACHER", subject: "Speech Therapist" },
     lastMessage: "Arjun did great in today's session! He named 8 objects correctly.",
     lastMessageAt: "2024-05-22T14:30:00Z",
     unreadCount: 1,
@@ -94,18 +94,18 @@ export default function ParentCommunicationPage() {
                 key={thread.id}
                 onClick={() => setSelectedThread(thread)}
                 className={`w-full p-4 text-left hover:bg-gray-50 transition-colors ${
-                  selectedThread.id === thread.id ? "bg-purple-50 border-l-2 border-purple-500" : ""
+                  selectedThread.id === thread.id ? "bg-neutral-100 border-l-2 border-neutral-300" : ""
                 }`}
               >
                 <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center text-sm font-bold text-purple-700 flex-shrink-0">
+                  <div className="w-10 h-10 bg-neutral-100 rounded-full flex items-center justify-center text-sm font-bold text-neutral-800 flex-shrink-0">
                     {thread.teacher.name.charAt(0)}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
                       <p className="font-semibold text-gray-900 text-sm truncate">{thread.teacher.name}</p>
                       {thread.unreadCount > 0 && (
-                        <span className="w-5 h-5 bg-purple-600 text-white text-xs rounded-full flex items-center justify-center flex-shrink-0">
+                        <span className="w-5 h-5 bg-neutral-100 text-white text-xs rounded-full flex items-center justify-center flex-shrink-0">
                           {thread.unreadCount}
                         </span>
                       )}
@@ -123,7 +123,7 @@ export default function ParentCommunicationPage() {
         <div className="lg:col-span-2 bg-white rounded-xl border border-gray-100 shadow-sm flex flex-col overflow-hidden">
           {/* Header */}
           <div className="p-4 border-b border-gray-100 flex items-center gap-3">
-            <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center text-sm font-bold text-purple-700">
+            <div className="w-10 h-10 bg-neutral-100 rounded-full flex items-center justify-center text-sm font-bold text-neutral-800">
               {selectedThread.teacher.name.charAt(0)}
             </div>
             <div>
@@ -139,12 +139,12 @@ export default function ParentCommunicationPage() {
                 <div
                   className={`max-w-xs lg:max-w-sm px-4 py-3 rounded-2xl text-sm leading-relaxed ${
                     msg.sender === "parent"
-                      ? "bg-purple-600 text-white rounded-tr-none"
+                      ? "bg-neutral-100 text-white rounded-tr-none"
                       : "bg-gray-100 text-gray-800 rounded-tl-none"
                   }`}
                 >
                   <p>{msg.content}</p>
-                  <p className={`text-xs mt-1 ${msg.sender === "parent" ? "text-purple-300" : "text-gray-400"}`}>
+                  <p className={`text-xs mt-1 ${msg.sender === "parent" ? "text-neutral-800" : "text-gray-400"}`}>
                     {new Date(msg.time).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}
                   </p>
                 </div>
@@ -161,12 +161,12 @@ export default function ParentCommunicationPage() {
                 onChange={(e) => setNewMessage(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && sendMessage()}
                 placeholder="Type your message..."
-                className="flex-1 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-purple-400"
+                className="flex-1 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-neutral-400"
               />
               <Button
                 onClick={sendMessage}
                 disabled={sending || !newMessage.trim()}
-                className="bg-purple-600 hover:bg-purple-700 h-10 w-10 p-0"
+                className="bg-black hover:bg-neutral-800 text-white h-10 w-10 p-0"
               >
                 <Send className="w-4 h-4" />
               </Button>

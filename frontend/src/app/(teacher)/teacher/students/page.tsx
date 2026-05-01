@@ -18,12 +18,12 @@ interface Student {
 
 const mockStudents: Student[] = [
   { id: 1, name: "Arjun Kumar", student_id: "GALS20240001", age: 9, autism_level: "Level1", is_active: true },
-  { id: 2, name: "Priya Sharma", student_id: "GALS20240002", age: 11, autism_level: "Level2", is_active: true },
+  { id: 2, name: "Hridhya Shukla", student_id: "GALS20240002", age: 11, autism_level: "Level2", is_active: true },
   { id: 3, name: "Rohan Mehta", student_id: "GALS20240003", age: 10, autism_level: "Level1", is_active: true },
 ];
 
 const levelColors: Record<string, string> = {
-  Level1: "bg-purple-100 text-purple-700",
+  Level1: "bg-neutral-100 text-neutral-800",
   Level2: "bg-yellow-100 text-yellow-700",
   Level3: "bg-red-100 text-red-700",
 };
@@ -48,7 +48,7 @@ export default function TeacherStudentsPage() {
 
       {loading ? (
         <div className="flex justify-center py-12">
-          <div className="w-8 h-8 border-4 border-purple-400 border-t-transparent rounded-full animate-spin"></div>
+          <div className="w-8 h-8 border-4 border-neutral-300 border-t-transparent rounded-full animate-spin"></div>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -56,7 +56,7 @@ export default function TeacherStudentsPage() {
             <div key={student.id} className="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
               <div className="flex items-start justify-between mb-3">
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center text-xl font-bold text-purple-700">
+                  <div className="w-12 h-12 bg-neutral-100 rounded-full flex items-center justify-center text-xl font-bold text-neutral-800">
                     {student.name.charAt(0)}
                   </div>
                   <div>
@@ -81,7 +81,7 @@ export default function TeacherStudentsPage() {
                     View
                   </Button>
                 </Link>
-                <Button size="sm" className="flex-1 bg-purple-600 hover:bg-purple-700 text-xs gap-1">
+                <Button size="sm" className="flex-1 bg-black hover:bg-neutral-800 text-white text-xs gap-1">
                   <Activity className="w-3.5 h-3.5" />
                   Progress
                 </Button>

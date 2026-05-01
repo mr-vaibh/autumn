@@ -28,10 +28,10 @@ type OTPVerifyForm = z.infer<typeof otpVerifySchema>;
 
 type Role = "ADMIN" | "TEACHER" | "PARENT";
 
-const roles: { id: Role; label: string; icon: string; description: string }[] = [
-  { id: "ADMIN", label: "Admin", icon: "🏛️", description: "School Administrator" },
-  { id: "TEACHER", label: "Teacher", icon: "📚", description: "Teacher / Therapist" },
-  { id: "PARENT", label: "Parent", icon: "👨‍👩‍👧", description: "Parent / Guardian" },
+const roles: { id: Role; label: string; description: string }[] = [
+  { id: "ADMIN", label: "Admin", description: "School Administrator" },
+  { id: "TEACHER", label: "Teacher / Therapist", description: "Teacher, Therapist, Dietician" },
+  { id: "PARENT", label: "Parent", description: "Parent / Guardian" },
 ];
 
 export default function LoginPage() {
@@ -52,7 +52,6 @@ export default function LoginPage() {
     register: registerOTPReq,
     handleSubmit: handleOTPReqSubmit,
     formState: { errors: otpReqErrors },
-    getValues: getOTPReqValues,
   } = useForm<OTPRequestForm>({ resolver: zodResolver(otpRequestSchema) });
 
   const {
@@ -80,7 +79,7 @@ export default function LoginPage() {
       setOtpSent(true);
       toast.success("OTP sent! Check your phone/email.");
       if (resp.data.debug_otp) {
-        toast(`Debug OTP: ${resp.data.debug_otp}`, { icon: "🔑", duration: 10000 });
+        toast(`Debug OTP: ${resp.data.debug_otp}`, { duration: 10000 });
       }
     } catch (error: unknown) {
       const axiosError = error as { response?: { data?: { detail?: string } } };
@@ -102,16 +101,13 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="bg-white/10 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/20 overflow-hidden">
+    <div className="border border-neutral-200 rounded-lg overflow-hidden">
       {/* Header */}
-      <div className="bg-gradient-to-r from-purple-700 to-blue-700 p-8 text-center">
-        <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4 text-4xl">
-          🌟
-        </div>
-        <h1 className="text-2xl font-bold text-white tracking-tight">
-          GLOBAL AUTISM LEARNING
+      <div className="bg-black p-8 text-center">
+        <h1 className="text-xl font-semibold text-white tracking-tight">
+          Global Autism Learning
         </h1>
-        <p className="text-purple-200 text-sm mt-1 font-medium">
+        <p className="text-neutral-400 text-sm mt-1">
           School Management System
         </p>
       </div>
@@ -119,7 +115,7 @@ export default function LoginPage() {
       <div className="p-8">
         {/* Role Selector */}
         <div className="mb-6">
-          <p className="text-white/70 text-xs font-medium uppercase tracking-wider mb-3">
+          <p className="text-xs font-medium uppercase tracking-wider text-neutral-500 mb-3">
             Select Your Role
           </p>
           <div className="grid grid-cols-3 gap-2">
@@ -128,14 +124,13 @@ export default function LoginPage() {
                 key={role.id}
                 type="button"
                 onClick={() => setSelectedRole(role.id)}
-                className={`flex flex-col items-center p-3 rounded-xl border-2 transition-all duration-200 cursor-pointer ${
+                className={`flex flex-col items-center p-3 rounded-lg border transition-all cursor-pointer ${
                   selectedRole === role.id
-                    ? "border-purple-400 bg-purple-500/30 text-white"
-                    : "border-white/20 bg-white/5 text-white/60 hover:border-white/40 hover:bg-white/10"
+                    ? "border-black bg-black text-white"
+                    : "border-neutral-200 bg-white text-neutral-600 hover:border-neutral-400"
                 }`}
               >
-                <span className="text-xl mb-1">{role.icon}</span>
-                <span className="text-xs font-semibold">{role.label}</span>
+                <span className="text-sm font-medium">{role.label}</span>
                 <span className="text-xs opacity-70 text-center leading-tight mt-0.5">
                   {role.description}
                 </span>
@@ -145,24 +140,24 @@ export default function LoginPage() {
         </div>
 
         {/* Toggle OTP / Password */}
-        <div className="flex bg-white/10 rounded-lg p-1 mb-6">
+        <div className="flex bg-neutral-100 rounded-lg p-1 mb-6">
           <button
             type="button"
             onClick={() => { setUseOTP(false); setOtpSent(false); }}
             className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all ${
-              !useOTP ? "bg-purple-600 text-white shadow-sm" : "text-white/60 hover:text-white"
+              !useOTP ? "bg-black text-white" : "text-neutral-500 hover:text-black"
             }`}
           >
-            Password Login
+            Password
           </button>
           <button
             type="button"
             onClick={() => setUseOTP(true)}
             className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all ${
-              useOTP ? "bg-purple-600 text-white shadow-sm" : "text-white/60 hover:text-white"
+              useOTP ? "bg-black text-white" : "text-neutral-500 hover:text-black"
             }`}
           >
-            OTP Login
+            OTP
           </button>
         </div>
 
@@ -170,41 +165,41 @@ export default function LoginPage() {
         {!useOTP && (
           <form onSubmit={handleLoginSubmit(onLoginSubmit)} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-white/80 mb-1.5">
+              <label className="block text-sm font-medium text-neutral-700 mb-1.5">
                 Email Address
               </label>
               <input
                 {...registerLogin("email")}
                 type="email"
                 placeholder="admin@autism.school"
-                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all"
+                className="w-full px-3 py-2.5 bg-white border border-neutral-300 rounded-lg text-black placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all"
               />
               {loginErrors.email && (
-                <p className="text-red-400 text-xs mt-1">{loginErrors.email.message}</p>
+                <p className="text-red-600 text-xs mt-1">{loginErrors.email.message}</p>
               )}
             </div>
             <div>
-              <label className="block text-sm font-medium text-white/80 mb-1.5">
+              <label className="block text-sm font-medium text-neutral-700 mb-1.5">
                 Password
               </label>
               <input
                 {...registerLogin("password")}
                 type="password"
-                placeholder="••••••••"
-                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all"
+                placeholder="Enter your password"
+                className="w-full px-3 py-2.5 bg-white border border-neutral-300 rounded-lg text-black placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all"
               />
               {loginErrors.password && (
-                <p className="text-red-400 text-xs mt-1">{loginErrors.password.message}</p>
+                <p className="text-red-600 text-xs mt-1">{loginErrors.password.message}</p>
               )}
             </div>
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold rounded-xl transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-purple-500/25"
+              className="w-full py-2.5 bg-black hover:bg-neutral-800 text-white font-medium rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               {isLoading ? (
                 <>
-                  <div className="w-5 h-5 border-2 border-white/40 border-t-white rounded-full animate-spin"></div>
+                  <div className="w-4 h-4 border-2 border-neutral-600 border-t-white rounded-full animate-spin"></div>
                   Signing in...
                 </>
               ) : (
@@ -218,27 +213,27 @@ export default function LoginPage() {
         {useOTP && !otpSent && (
           <form onSubmit={handleOTPReqSubmit(onOTPRequest)} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-white/80 mb-1.5">
+              <label className="block text-sm font-medium text-neutral-700 mb-1.5">
                 Email Address
               </label>
               <input
                 {...registerOTPReq("email")}
                 type="email"
                 placeholder="your@email.com"
-                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all"
+                className="w-full px-3 py-2.5 bg-white border border-neutral-300 rounded-lg text-black placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all"
               />
               {otpReqErrors.email && (
-                <p className="text-red-400 text-xs mt-1">{otpReqErrors.email.message}</p>
+                <p className="text-red-600 text-xs mt-1">{otpReqErrors.email.message}</p>
               )}
             </div>
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold rounded-xl transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-purple-500/25"
+              className="w-full py-2.5 bg-black hover:bg-neutral-800 text-white font-medium rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               {isLoading ? (
                 <>
-                  <div className="w-5 h-5 border-2 border-white/40 border-t-white rounded-full animate-spin"></div>
+                  <div className="w-4 h-4 border-2 border-neutral-600 border-t-white rounded-full animate-spin"></div>
                   Sending OTP...
                 </>
               ) : (
@@ -250,13 +245,13 @@ export default function LoginPage() {
 
         {useOTP && otpSent && (
           <form onSubmit={handleOTPVerifySubmit(onOTPVerify)} className="space-y-4">
-            <div className="bg-purple-500/20 rounded-xl p-4 text-center">
-              <p className="text-white/80 text-sm">OTP sent to <strong className="text-white">{otpEmail}</strong></p>
-              <p className="text-white/60 text-xs mt-1">Valid for 10 minutes</p>
+            <div className="bg-neutral-100 rounded-lg p-4 text-center">
+              <p className="text-neutral-600 text-sm">OTP sent to <strong className="text-black">{otpEmail}</strong></p>
+              <p className="text-neutral-400 text-xs mt-1">Valid for 10 minutes</p>
             </div>
             <input type="hidden" {...registerOTPVerify("email")} value={otpEmail} />
             <div>
-              <label className="block text-sm font-medium text-white/80 mb-1.5">
+              <label className="block text-sm font-medium text-neutral-700 mb-1.5">
                 Enter OTP
               </label>
               <input
@@ -264,27 +259,27 @@ export default function LoginPage() {
                 type="text"
                 placeholder="123456"
                 maxLength={6}
-                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all text-center text-xl tracking-[0.5em] font-mono"
+                className="w-full px-3 py-2.5 bg-white border border-neutral-300 rounded-lg text-black placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all text-center text-xl tracking-[0.5em] font-mono"
               />
               {otpVerifyErrors.otp && (
-                <p className="text-red-400 text-xs mt-1">{otpVerifyErrors.otp.message}</p>
+                <p className="text-red-600 text-xs mt-1">{otpVerifyErrors.otp.message}</p>
               )}
             </div>
             <div className="flex gap-3">
               <button
                 type="button"
                 onClick={() => setOtpSent(false)}
-                className="flex-1 py-3 bg-white/10 hover:bg-white/20 text-white font-medium rounded-xl transition-all"
+                className="flex-1 py-2.5 bg-white border border-neutral-300 hover:bg-neutral-50 text-black font-medium rounded-lg transition-all"
               >
                 Back
               </button>
               <button
                 type="submit"
                 disabled={isLoading}
-                className="flex-1 py-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold rounded-xl transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="flex-1 py-2.5 bg-black hover:bg-neutral-800 text-white font-medium rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 {isLoading ? (
-                  <div className="w-5 h-5 border-2 border-white/40 border-t-white rounded-full animate-spin"></div>
+                  <div className="w-4 h-4 border-2 border-neutral-600 border-t-white rounded-full animate-spin"></div>
                 ) : (
                   "Verify & Login"
                 )}
@@ -294,11 +289,21 @@ export default function LoginPage() {
         )}
 
         {/* Demo credentials */}
-        <div className="mt-6 p-4 bg-white/5 rounded-xl border border-white/10">
-          <p className="text-white/60 text-xs font-medium mb-2">Demo Credentials</p>
-          <div className="space-y-1">
-            <p className="text-white/80 text-xs font-mono">admin@autism.school</p>
-            <p className="text-white/80 text-xs font-mono">Admin@123</p>
+        <div className="mt-6 p-4 bg-neutral-50 rounded-lg border border-neutral-200">
+          <p className="text-neutral-500 text-xs font-medium mb-3">Demo Credentials</p>
+          <div className="space-y-2">
+            {[
+              { role: "Admin", email: "admin@autism.school", pass: "Admin@123" },
+              { role: "Teacher", email: "teacher@autism.school", pass: "Test@1234" },
+              { role: "Therapist", email: "therapist@autism.school", pass: "Test@1234" },
+              { role: "Parent", email: "parent@autism.school", pass: "Test@1234" },
+            ].map(({ role, email, pass }) => (
+              <div key={role} className="flex items-center justify-between gap-2">
+                <span className="text-neutral-400 text-xs w-16">{role}</span>
+                <span className="text-neutral-700 text-xs font-mono flex-1">{email}</span>
+                <span className="text-neutral-500 text-xs font-mono">{pass}</span>
+              </div>
+            ))}
           </div>
         </div>
       </div>

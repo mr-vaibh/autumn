@@ -17,13 +17,13 @@ const todayPeriods = [
 
 const pendingReports = [
   { id: 1, student: "Arjun Kumar", session: "Speech Therapy", date: "2024-05-22", urgency: "high" },
-  { id: 2, student: "Priya Sharma", session: "OT Session", date: "2024-05-21", urgency: "medium" },
+  { id: 2, student: "Hridhya Shukla", session: "OT Session", date: "2024-05-21", urgency: "medium" },
   { id: 3, student: "Rohan Mehta", session: "Sensory Integration", date: "2024-05-20", urgency: "low" },
 ];
 
 const statusColors: Record<string, string> = {
   completed: "bg-green-100 text-green-700",
-  in_progress: "bg-blue-100 text-blue-700",
+  in_progress: "bg-neutral-100 text-neutral-700",
   upcoming: "bg-gray-100 text-gray-600",
 };
 
@@ -74,7 +74,7 @@ export default function TeacherDashboard() {
         {/* Today's Timetable */}
         <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
           <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-            <Calendar className="w-5 h-5 text-purple-600" />
+            <Calendar className="w-5 h-5 text-neutral-800" />
             Today&apos;s Schedule
           </h3>
           <div className="space-y-3">
@@ -82,7 +82,7 @@ export default function TeacherDashboard() {
               <div key={period.id} className="flex items-center gap-4 p-3 rounded-lg border border-gray-100 hover:bg-gray-50 transition-colors">
                 <div className={`w-2 h-full min-h-[40px] rounded-full ${
                   period.status === "completed" ? "bg-green-400" :
-                  period.status === "in_progress" ? "bg-blue-400" : "bg-gray-200"
+                  period.status === "in_progress" ? "bg-neutral-100" : "bg-gray-200"
                 }`}></div>
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold text-gray-900 text-sm">{period.subject}</p>
@@ -108,14 +108,14 @@ export default function TeacherDashboard() {
           <div className="space-y-3">
             {pendingReports.map((report) => (
               <div key={report.id} className="flex items-center gap-3 p-3 rounded-lg border border-gray-100">
-                <div className="w-9 h-9 bg-purple-100 rounded-full flex items-center justify-center text-sm font-bold text-purple-700">
+                <div className="w-9 h-9 bg-neutral-100 rounded-full flex items-center justify-center text-sm font-bold text-neutral-800">
                   {report.student.charAt(0)}
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold text-gray-900 text-sm">{report.student}</p>
                   <p className="text-xs text-gray-500">{report.session} • {formatDate(report.date)}</p>
                 </div>
-                <button className="bg-purple-600 hover:bg-purple-700 text-white text-xs px-3 py-1.5 rounded-lg font-medium transition-colors">
+                <button className="bg-black hover:bg-neutral-800 text-white text-white text-xs px-3 py-1.5 rounded-lg font-medium transition-colors">
                   Write Report
                 </button>
               </div>
