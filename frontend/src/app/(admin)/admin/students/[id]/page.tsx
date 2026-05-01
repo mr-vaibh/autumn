@@ -15,7 +15,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { formatDate } from "@/lib/utils";
-import { ArrowLeft, Edit, Phone, Calendar, FileText, Activity, UserPlus } from "lucide-react";
+import { ArrowLeft, Edit, Phone, Calendar, FileText, Activity, UserPlus, Upload, Download, Trash2 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import toast from "react-hot-toast";
 
@@ -43,6 +45,16 @@ interface Student {
     relationship: string;
     is_primary: boolean;
   }>;
+}
+
+interface Document {
+  id: number;
+  title: string;
+  document_type: string;
+  notes: string;
+  uploaded_by_name: string;
+  created_at: string;
+  file: string;
 }
 
 interface FoundUser {
@@ -79,6 +91,13 @@ export default function StudentDetailPage() {
   const [student, setStudent] = useState<Student | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // Documents state
+  const [documents, setDocuments] = useState<Document[]>([]);
+  const [uploadOpen, setUploadOpen] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [uploadForm, setUploadForm] = useState({ title: "", document_type: "other", notes: "" });
+  const [uploadFile, setUploadFile] = useState<File | null>(null);
+
   // Link Parent dialog state
   const [linkOpen, setLinkOpen] = useState(false);
   const [parentEmail, setParentEmail] = useState("");
@@ -88,6 +107,36 @@ export default function StudentDetailPage() {
   const [linking, setLinking] = useState(false);
 
   const studentId = Number(params.id);
+
+  const fetchDocuments = () => {
+    studentsApi.getDocuments(studentId)
+      .then((res) => setDocuments(res.data.results || res.data))
+      .catch(() => {});
+  };
+
+  const handleUpload = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!uploadFile) { toast.error("Please select a file"); return; }
+    if (!uploadForm.title.trim()) { toast.error("Please enter a title"); return; }
+    setUploading(true);
+    try {
+      const fd = new FormData();
+      fd.append("file", uploadFile);
+      fd.append("title", uploadForm.title);
+      fd.append("document_type", uploadForm.document_type);
+      fd.append("notes", uploadForm.notes);
+      await studentsApi.uploadDocument(studentId, fd);
+      toast.success("Document uploaded");
+      setUploadOpen(false);
+      setUploadForm({ title: "", document_type: "other", notes: "" });
+      setUploadFile(null);
+      fetchDocuments();
+    } catch {
+      toast.error("Failed to upload document");
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const fetchStudent = () => {
     studentsApi.get(studentId)
@@ -108,6 +157,7 @@ export default function StudentDetailPage() {
 
   useEffect(() => {
     fetchStudent();
+    fetchDocuments();
   }, [params.id]);
 
   useEffect(() => {
@@ -355,15 +405,76 @@ export default function StudentDetailPage() {
           <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-semibold text-gray-900">Documents</h3>
-              <Button size="sm" className="gap-2 bg-black hover:bg-neutral-800 text-white">
-                <FileText className="w-4 h-4" />
+              <Button size="sm" className="gap-2 bg-black hover:bg-neutral-800 text-white" onClick={() => setUploadOpen(true)}>
+                <Upload className="w-4 h-4" />
                 Upload Document
               </Button>
             </div>
-            <p className="text-gray-400 text-sm text-center py-8">No documents uploaded yet</p>
+            {documents.length === 0 ? (
+              <p className="text-gray-400 text-sm text-center py-8">No documents uploaded yet</p>
+            ) : (
+              <div className="space-y-2">
+                {documents.map((doc) => (
+                  <div key={doc.id} className="flex items-center justify-between p-3 rounded-lg border border-gray-100 hover:bg-gray-50">
+                    <div className="flex items-center gap-3">
+                      <FileText className="w-5 h-5 text-gray-400 flex-shrink-0" />
+                      <div>
+                        <p className="text-sm font-medium text-gray-900">{doc.title}</p>
+                        <p className="text-xs text-gray-400 capitalize">{doc.document_type.replace("_", " ")} · {formatDate(doc.created_at)}</p>
+                      </div>
+                    </div>
+                    <a href={doc.file} target="_blank" rel="noopener noreferrer">
+                      <Button variant="ghost" size="icon" className="h-8 w-8">
+                        <Download className="w-4 h-4" />
+                      </Button>
+                    </a>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </TabsContent>
       </Tabs>
+
+      {/* Upload Document Dialog */}
+      <Dialog open={uploadOpen} onOpenChange={(open) => { setUploadOpen(open); if (!open) { setUploadFile(null); setUploadForm({ title: "", document_type: "other", notes: "" }); } }}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Upload Document</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleUpload} className="space-y-4 mt-2">
+            <div className="space-y-1.5">
+              <Label htmlFor="doc-title">Title *</Label>
+              <Input id="doc-title" value={uploadForm.title} onChange={(e) => setUploadForm({ ...uploadForm, title: e.target.value })} placeholder="e.g. Medical Assessment Report" required />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="doc-type">Document Type</Label>
+              <select id="doc-type" value={uploadForm.document_type} onChange={(e) => setUploadForm({ ...uploadForm, document_type: e.target.value })} className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
+                <option value="medical">Medical Report</option>
+                <option value="assessment">Assessment Report</option>
+                <option value="consent">Consent Form</option>
+                <option value="birth_cert">Birth Certificate</option>
+                <option value="photo_id">Photo ID</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="doc-file">File *</Label>
+              <input id="doc-file" type="file" required onChange={(e) => setUploadFile(e.target.files?.[0] || null)} className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium cursor-pointer" />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="doc-notes">Notes (optional)</Label>
+              <Input id="doc-notes" value={uploadForm.notes} onChange={(e) => setUploadForm({ ...uploadForm, notes: e.target.value })} placeholder="Any additional notes" />
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setUploadOpen(false)}>Cancel</Button>
+              <Button type="submit" disabled={uploading} className="bg-black text-white hover:bg-neutral-800">
+                {uploading ? "Uploading..." : "Upload"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
 
       {/* Link Parent Dialog */}
       <Dialog open={linkOpen} onOpenChange={(open) => {
