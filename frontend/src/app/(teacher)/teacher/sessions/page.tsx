@@ -23,11 +23,11 @@ interface SessionReport {
 }
 
 const mockSessions: SessionReport[] = [
-  { id: 1, period_subject: "Speech Therapy", class_name: "Level 1 - A", date: "2024-05-22", status: "completed", improvement_level: 4, teacher_name: "Priya S." },
-  { id: 2, period_subject: "OT Session", class_name: "Level 2 - A", date: "2024-05-22", status: "pending", improvement_level: null, teacher_name: "Priya S." },
-  { id: 3, period_subject: "Sensory Integration", class_name: "Level 1 - A", date: "2024-05-21", status: "completed", improvement_level: 3, teacher_name: "Priya S." },
-  { id: 4, period_subject: "Speech Therapy", class_name: "Level 3 - A", date: "2024-05-20", status: "skipped", improvement_level: null, teacher_name: "Priya S." },
-  { id: 5, period_subject: "ABA Therapy", class_name: "Level 2 - B", date: "2024-05-19", status: "completed", improvement_level: 5, teacher_name: "Priya S." },
+  { id: 1, period_subject: "Speech Therapy", class_name: "Level 1 - A", date: "2024-05-22", status: "completed", improvement_level: 4, teacher_name: "Sarthak Nehra" },
+  { id: 2, period_subject: "OT Session", class_name: "Level 2 - A", date: "2024-05-22", status: "pending", improvement_level: null, teacher_name: "Sarthak Nehra" },
+  { id: 3, period_subject: "Sensory Integration", class_name: "Level 1 - A", date: "2024-05-21", status: "completed", improvement_level: 3, teacher_name: "Sarthak Nehra" },
+  { id: 4, period_subject: "Speech Therapy", class_name: "Level 3 - A", date: "2024-05-20", status: "skipped", improvement_level: null, teacher_name: "Sarthak Nehra" },
+  { id: 5, period_subject: "ABA Therapy", class_name: "Level 2 - B", date: "2024-05-19", status: "completed", improvement_level: 5, teacher_name: "Sarthak Nehra" },
 ];
 
 const statusBadge: Record<string, "success" | "warning" | "secondary"> = {

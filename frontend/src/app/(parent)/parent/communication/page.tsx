@@ -10,7 +10,7 @@ import toast from "react-hot-toast";
 const mockThreads = [
   {
     id: "thread-1",
-    teacher: { id: 1, name: "Priya S.", role: "TEACHER", subject: "Speech Therapist" },
+    teacher: { id: 1, name: "Sarthak Nehra", role: "TEACHER", subject: "Speech Therapist" },
     lastMessage: "Arjun did great in today's session! He named 8 objects correctly.",
     lastMessageAt: "2024-05-22T14:30:00Z",
     unreadCount: 1,

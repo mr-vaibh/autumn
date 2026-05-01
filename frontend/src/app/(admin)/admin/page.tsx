@@ -141,7 +141,7 @@ export default function AdminDashboard() {
           <h3 className="font-semibold text-gray-900 mb-4">Today&apos;s Schedule</h3>
           <div className="space-y-3">
             {[
-              { time: "9:00 AM", activity: "Speech Therapy - Level 1", teacher: "Ms. Priya" },
+              { time: "9:00 AM", activity: "Speech Therapy - Level 1", teacher: "Mr. Sarthak" },
               { time: "10:00 AM", activity: "Occupational Therapy", teacher: "Dr. Rahul" },
               { time: "11:00 AM", activity: "Sensory Integration", teacher: "Ms. Anita" },
               { time: "2:00 PM", activity: "ABA Therapy", teacher: "Dr. Kumar" },

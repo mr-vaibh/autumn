@@ -12,7 +12,7 @@ const childInfo = {
   name: "Arjun Kumar",
   studentId: "GALS20240001",
   level: "Level 1",
-  teacher: "Priya S.",
+  teacher: "Sarthak Nehra",
 };
 
 const recentSessions = [
@@ -22,7 +22,7 @@ const recentSessions = [
 ];
 
 const todaySchedule = [
-  { time: "9:00 AM", subject: "Speech Therapy", teacher: "Ms. Priya S." },
+  { time: "9:00 AM", subject: "Speech Therapy", teacher: "Ms. Sarthak Nehra" },
   { time: "11:00 AM", subject: "OT Session", teacher: "Dr. Rahul Kumar" },
   { time: "2:00 PM", subject: "Sensory Integration", teacher: "Ms. Anita" },
 ];

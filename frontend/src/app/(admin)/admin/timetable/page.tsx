@@ -29,11 +29,11 @@ interface Period {
 const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
 const mockPeriods: Period[] = [
-  { id: 1, name: "Speech Therapy", subject: "Speech Therapy", teacher_name: "Priya S.", class_name: "Level 1 - A", section_name: "Morning", day_of_week: 0, day_name: "Monday", start_time: "09:00", end_time: "10:00", color: "#7C3AED", room: "Room 1", is_active: true },
+  { id: 1, name: "Speech Therapy", subject: "Speech Therapy", teacher_name: "Sarthak Nehra", class_name: "Level 1 - A", section_name: "Morning", day_of_week: 0, day_name: "Monday", start_time: "09:00", end_time: "10:00", color: "#7C3AED", room: "Room 1", is_active: true },
   { id: 2, name: "Occupational Therapy", subject: "OT", teacher_name: "Rahul Kumar", class_name: "Level 2 - A", section_name: "Morning", day_of_week: 0, day_name: "Monday", start_time: "10:00", end_time: "11:00", color: "#2563EB", room: "OT Room", is_active: true },
   { id: 3, name: "Sensory Integration", subject: "Sensory", teacher_name: "Anita Sharma", class_name: "Level 1 - A", section_name: "Morning", day_of_week: 1, day_name: "Tuesday", start_time: "09:00", end_time: "10:00", color: "#059669", room: "Sensory Room", is_active: true },
   { id: 4, name: "ABA Therapy", subject: "ABA", teacher_name: "Vijay Nair", class_name: "Level 2 - A", section_name: "Morning", day_of_week: 1, day_name: "Tuesday", start_time: "10:00", end_time: "11:30", color: "#DC2626", room: "ABA Room", is_active: true },
-  { id: 5, name: "Art Therapy", subject: "Art", teacher_name: "Priya S.", class_name: "Level 1 - A", section_name: "Afternoon", day_of_week: 2, day_name: "Wednesday", start_time: "14:00", end_time: "15:00", color: "#F59E0B", room: "Art Room", is_active: true },
+  { id: 5, name: "Art Therapy", subject: "Art", teacher_name: "Sarthak Nehra", class_name: "Level 1 - A", section_name: "Afternoon", day_of_week: 2, day_name: "Wednesday", start_time: "14:00", end_time: "15:00", color: "#F59E0B", room: "Art Room", is_active: true },
   { id: 6, name: "Music Therapy", subject: "Music", teacher_name: "Rahul Kumar", class_name: "Level 3 - A", section_name: "Morning", day_of_week: 3, day_name: "Thursday", start_time: "09:30", end_time: "10:30", color: "#8B5CF6", room: "Music Room", is_active: true },
   { id: 7, name: "Physical Therapy", subject: "PT", teacher_name: "Anita Sharma", class_name: "Level 2 - A", section_name: "Morning", day_of_week: 4, day_name: "Friday", start_time: "11:00", end_time: "12:00", color: "#14B8A6", room: "Gym", is_active: true },
 ];

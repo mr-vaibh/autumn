@@ -35,7 +35,7 @@ interface ClassData {
 const mockClasses: ClassData[] = [
   {
     id: 1, name: "Autism Level 1 - Group A", academic_year_name: "2024-25",
-    teacher_name: "Priya S.", description: "For students requiring support",
+    teacher_name: "Sarthak Nehra", description: "For students requiring support",
     color: "#7C3AED", is_active: true,
     sections: [{ id: 1, name: "Morning Batch", capacity: 8, student_count: 6, is_full: false }],
     total_students: 6,
@@ -59,7 +59,7 @@ const mockClasses: ClassData[] = [
   },
   {
     id: 4, name: "Speech Therapy", academic_year_name: "2024-25",
-    teacher_name: "Priya S.", description: "Individual speech therapy sessions",
+    teacher_name: "Sarthak Nehra", description: "Individual speech therapy sessions",
     color: "#059669", is_active: true,
     sections: [{ id: 5, name: "Individual Sessions", capacity: 10, student_count: 8, is_full: false }],
     total_students: 8,
