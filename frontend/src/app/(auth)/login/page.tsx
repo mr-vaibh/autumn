@@ -303,24 +303,6 @@ export default function LoginPage() {
           </form>
         )}
 
-        {/* Demo credentials */}
-        <div className="mt-6 p-4 bg-neutral-50 rounded-lg border border-neutral-200">
-          <p className="text-neutral-500 text-xs font-medium mb-3">Demo Credentials</p>
-          <div className="space-y-2">
-            {[
-              { role: "Admin", email: "admin@autism.school", pass: "Admin@123" },
-              { role: "Teacher", email: "teacher@autism.school", pass: "Test@1234" },
-              { role: "Therapist", email: "therapist@autism.school", pass: "Test@1234" },
-              { role: "Parent", email: "parent@autism.school", pass: "Test@1234" },
-            ].map(({ role, email, pass }) => (
-              <div key={role} className="flex items-center justify-between gap-2">
-                <span className="text-neutral-400 text-xs w-16">{role}</span>
-                <span className="text-neutral-700 text-xs font-mono flex-1">{email}</span>
-                <span className="text-neutral-500 text-xs font-mono">{pass}</span>
-              </div>
-            ))}
-          </div>
-        </div>
       </div>
 
       {/* Forgot Password Dialog */}
