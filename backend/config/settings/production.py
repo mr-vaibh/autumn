@@ -18,7 +18,7 @@ LOGGING = {
     'handlers': {
         'file': {
             'class': 'logging.FileHandler',
-            'filename': '/app/logs/django.log',
+            'filename': '/root/autumn/logs/django.log',
         },
         'console': {
             'class': 'logging.StreamHandler',
