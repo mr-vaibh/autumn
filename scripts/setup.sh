@@ -36,6 +36,21 @@ echo "==> Running migrations"
 cd backend
 DJANGO_SETTINGS_MODULE=config.settings.production DB_HOST=localhost python manage.py migrate --noinput
 DJANGO_SETTINGS_MODULE=config.settings.production DB_HOST=localhost python manage.py collectstatic --noinput
+
+echo "==> Ensuring admin user exists"
+DJANGO_SETTINGS_MODULE=config.settings.production DB_HOST=localhost python manage.py shell << 'PYTHON'
+import os
+from apps.users.models import User
+email = os.environ.get("DEFAULT_ADMIN_EMAIL")
+password = os.environ.get("DEFAULT_ADMIN_PASSWORD")
+if not email or not password:
+    print("DEFAULT_ADMIN_EMAIL or DEFAULT_ADMIN_PASSWORD not set, skipping admin creation")
+elif not User.objects.filter(email=email).exists():
+    User.objects.create_superuser(username="admin", email=email, password=password, role="ADMIN")
+    print(f"Admin created: {email}")
+else:
+    print(f"Admin already exists: {email}")
+PYTHON
 cd ..
 
 echo "==> Building frontend"
