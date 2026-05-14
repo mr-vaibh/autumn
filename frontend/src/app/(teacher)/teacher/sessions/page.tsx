@@ -208,7 +208,7 @@ export default function SessionsPage() {
       <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
         <DataTable
           data={filteredSessions as unknown as Record<string, unknown>[]}
-          columns={columns as Parameters<typeof DataTable>[0]["columns"]}
+          columns={columns as unknown as Parameters<typeof DataTable>[0]["columns"]}
           searchable={true}
           searchKeys={["period_subject" as keyof Record<string, unknown>]}
           isLoading={loading}

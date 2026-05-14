@@ -363,9 +363,9 @@ function ProfileSettingsDialog({
       setForm({
         first_name: first || "",
         last_name: rest.join(" "),
-        phone: (user as Record<string, unknown>).phone as string || "",
-        designation: (user as Record<string, unknown>).designation as string || "",
-        department: (user as Record<string, unknown>).department as string || "",
+        phone: (user as unknown as Record<string, unknown>).phone as string || "",
+        designation: (user as unknown as Record<string, unknown>).designation as string || "",
+        department: (user as unknown as Record<string, unknown>).department as string || "",
       });
     }
   }, [open, user]);

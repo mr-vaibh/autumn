@@ -48,7 +48,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (token) {
       const cachedUser = getUser();
       if (cachedUser) {
-        setUserState(cachedUser as UserData);
+        setUserState(cachedUser as unknown as UserData);
       }
       refreshUser().finally(() => setLoading(false));
     } else {

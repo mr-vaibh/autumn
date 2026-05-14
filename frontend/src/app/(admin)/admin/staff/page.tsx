@@ -197,7 +197,7 @@ export default function StaffPage() {
       <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
         <DataTable
           data={staff as unknown as Record<string, unknown>[]}
-          columns={columns as Parameters<typeof DataTable>[0]["columns"]}
+          columns={columns as unknown as Parameters<typeof DataTable>[0]["columns"]}
           searchable={true}
           searchKeys={["full_name" as keyof Record<string, unknown>, "email" as keyof Record<string, unknown>]}
           isLoading={loading}

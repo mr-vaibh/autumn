@@ -164,7 +164,7 @@ export default function ReportsPage() {
                     cy="50%"
                     outerRadius={90}
                     dataKey="value"
-                    label={({ name, value }) => `${name}: ${value}`}
+                    label={({ name, value }: { name: string; value: number }) => `${name}: ${value}`}
                   >
                     {levelDistribution.map((entry, index) => (
                       <Cell key={index} fill={entry.color} />

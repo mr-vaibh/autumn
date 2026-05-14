@@ -277,7 +277,7 @@ export default function FeesPage() {
           <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
             <DataTable
               data={filteredFees as unknown as Record<string, unknown>[]}
-              columns={feeColumns as Parameters<typeof DataTable>[0]["columns"]}
+              columns={feeColumns as unknown as Parameters<typeof DataTable>[0]["columns"]}
               searchable={true}
               searchKeys={["student_name" as keyof Record<string, unknown>]}
               isLoading={feesLoading}

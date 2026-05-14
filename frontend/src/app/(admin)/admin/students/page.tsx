@@ -381,7 +381,7 @@ export default function StudentsPage() {
       <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
         <DataTable
           data={students as unknown as Record<string, unknown>[]}
-          columns={columns as Parameters<typeof DataTable>[0]["columns"]}
+          columns={columns as unknown as Parameters<typeof DataTable>[0]["columns"]}
           searchable={true}
           searchKeys={["name" as keyof Record<string, unknown>, "student_id" as keyof Record<string, unknown>]}
           isLoading={loading}
