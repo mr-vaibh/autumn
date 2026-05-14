@@ -2,7 +2,6 @@
 const nextConfig = {
   reactStrictMode: true,
   output: 'standalone',
-  trailingSlash: true,
   images: {
     domains: ['localhost', 'backend'],
     remotePatterns: [

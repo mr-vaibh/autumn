@@ -1,7 +1,6 @@
 from .base import *
 
 DEBUG = False
-APPEND_SLASH = False
 
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
