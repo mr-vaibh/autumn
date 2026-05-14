@@ -42,8 +42,9 @@ echo "==> Building frontend"
 cd frontend
 npm install --prefer-offline -q
 npm run build
-cp -r public .next/standalone/public
-cp -r .next/static .next/standalone/.next/static
+mkdir -p .next/standalone/public .next/standalone/.next/static
+cp -r public/. .next/standalone/public/
+cp -r .next/static/. .next/standalone/.next/static/
 cd ..
 
 echo "==> Installing systemd services"
