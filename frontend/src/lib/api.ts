@@ -1,7 +1,7 @@
 import axios, { AxiosInstance, InternalAxiosRequestConfig, AxiosResponse, AxiosError } from "axios";
 import { getAccessToken, getRefreshToken, setTokens, removeTokens } from "./auth";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost/api";
+const API_BASE_URL = "/api";
 
 const api: AxiosInstance = axios.create({
   baseURL: API_BASE_URL,
@@ -73,7 +73,7 @@ api.interceptors.response.use(
       }
 
       try {
-        const response = await axios.post(`${API_BASE_URL}/auth/refresh/`, {
+        const response = await axios.post(`/api/auth/refresh/`, {
           refresh: refreshToken,
         });
         const { access, refresh } = response.data;
