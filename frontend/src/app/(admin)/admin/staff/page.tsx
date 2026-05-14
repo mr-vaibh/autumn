@@ -26,14 +26,6 @@ interface Staff {
   date_joined: string;
 }
 
-const mockStaff: Staff[] = [
-  { id: 1, email: "sarthak.teacher@autism.school", first_name: "Sarthak", last_name: "Nehra", full_name: "Sarthak Nehra", role: "TEACHER", phone: "+91 98765 11001", designation: "Speech Therapist", department: "Speech Therapy", is_active: true, date_joined: "2022-04-01" },
-  { id: 2, email: "rahul.therapist@autism.school", first_name: "Rahul", last_name: "Kumar", full_name: "Rahul Kumar", role: "THERAPIST", phone: "+91 98765 11002", designation: "Occupational Therapist", department: "OT", is_active: true, date_joined: "2022-07-15" },
-  { id: 3, email: "anita.teacher@autism.school", first_name: "Anita", last_name: "Sharma", full_name: "Anita Sharma", role: "TEACHER", phone: "+91 98765 11003", designation: "Special Educator", department: "Special Education", is_active: true, date_joined: "2023-01-10" },
-  { id: 4, email: "meena.diet@autism.school", first_name: "Meena", last_name: "Patel", full_name: "Meena Patel", role: "DIETICIAN", phone: "+91 98765 11004", designation: "Clinical Dietician", department: "Nutrition", is_active: true, date_joined: "2023-06-01" },
-  { id: 5, email: "vijay.therapist@autism.school", first_name: "Vijay", last_name: "Nair", full_name: "Vijay Nair", role: "THERAPIST", phone: "+91 98765 11005", designation: "ABA Therapist", department: "Behavioral Therapy", is_active: false, date_joined: "2021-09-01" },
-];
-
 const roleColors: Record<string, "purple" | "info" | "success" | "warning"> = {
   TEACHER: "purple",
   THERAPIST: "info",
@@ -66,7 +58,7 @@ export default function StaffPage() {
         const all = res.data.results || res.data;
         setStaff(all.filter((u: Staff) => u.role !== "ADMIN" && u.role !== "PARENT"));
       })
-      .catch(() => setStaff(mockStaff))
+      .catch(() => setStaff([]))
       .finally(() => setLoading(false));
   };
 

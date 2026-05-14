@@ -18,14 +18,6 @@ interface StudentFee {
   status: string;
 }
 
-const mockFees: StudentFee[] = [
-  { id: 1, fee_structure_name: "Monthly Therapy Fee - May 2024", due_date: "2024-06-01", amount: 8500, discount_amount: 0, net_amount: 8500, status: "pending" },
-  { id: 2, fee_structure_name: "Monthly Therapy Fee - Apr 2024", due_date: "2024-05-01", amount: 8500, discount_amount: 0, net_amount: 8500, status: "paid" },
-  { id: 3, fee_structure_name: "Monthly Therapy Fee - Mar 2024", due_date: "2024-04-01", amount: 8500, discount_amount: 500, net_amount: 8000, status: "paid" },
-  { id: 4, fee_structure_name: "Annual Admission Fee 2024-25", due_date: "2024-04-15", amount: 25000, discount_amount: 2500, net_amount: 22500, status: "paid" },
-  { id: 5, fee_structure_name: "Monthly Therapy Fee - Feb 2024", due_date: "2024-03-01", amount: 8500, discount_amount: 0, net_amount: 8500, status: "overdue" },
-];
-
 export default function ParentFeesPage() {
   const [fees, setFees] = useState<StudentFee[]>([]);
   const [loading, setLoading] = useState(true);
@@ -34,7 +26,7 @@ export default function ParentFeesPage() {
   useEffect(() => {
     feesApi.getStudentFees()
       .then((res) => setFees(res.data.results || res.data))
-      .catch(() => setFees(mockFees))
+      .catch(() => setFees([]))
       .finally(() => setLoading(false));
   }, []);
 

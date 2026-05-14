@@ -32,40 +32,6 @@ interface ClassData {
   total_students: number;
 }
 
-const mockClasses: ClassData[] = [
-  {
-    id: 1, name: "Autism Level 1 - Group A", academic_year_name: "2024-25",
-    teacher_name: "Sarthak Nehra", description: "For students requiring support",
-    color: "#7C3AED", is_active: true,
-    sections: [{ id: 1, name: "Morning Batch", capacity: 8, student_count: 6, is_full: false }],
-    total_students: 6,
-  },
-  {
-    id: 2, name: "Autism Level 2 - Group A", academic_year_name: "2024-25",
-    teacher_name: "Rahul Kumar", description: "For students requiring substantial support",
-    color: "#2563EB", is_active: true,
-    sections: [
-      { id: 2, name: "Morning Batch", capacity: 6, student_count: 5, is_full: false },
-      { id: 3, name: "Afternoon Batch", capacity: 6, student_count: 6, is_full: true },
-    ],
-    total_students: 11,
-  },
-  {
-    id: 3, name: "Autism Level 3 - Group A", academic_year_name: "2024-25",
-    teacher_name: "Anita Sharma", description: "For students requiring very substantial support",
-    color: "#DC2626", is_active: true,
-    sections: [{ id: 4, name: "Morning Batch", capacity: 4, student_count: 3, is_full: false }],
-    total_students: 3,
-  },
-  {
-    id: 4, name: "Speech Therapy", academic_year_name: "2024-25",
-    teacher_name: "Sarthak Nehra", description: "Individual speech therapy sessions",
-    color: "#059669", is_active: true,
-    sections: [{ id: 5, name: "Individual Sessions", capacity: 10, student_count: 8, is_full: false }],
-    total_students: 8,
-  },
-];
-
 export default function ClassesPage() {
   const [classes, setClasses] = useState<ClassData[]>([]);
   const [loading, setLoading] = useState(true);
@@ -85,7 +51,7 @@ export default function ClassesPage() {
   const fetchClasses = () => {
     classesApi.getAll()
       .then((res) => setClasses(res.data.results || res.data))
-      .catch(() => setClasses(mockClasses))
+      .catch(() => setClasses([]))
       .finally(() => setLoading(false));
   };
 

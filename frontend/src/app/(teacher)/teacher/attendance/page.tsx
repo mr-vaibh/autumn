@@ -15,15 +15,6 @@ interface Student {
   status: "present" | "absent" | "late" | "leave";
 }
 
-const mockStudents: Student[] = [
-  { id: 1, name: "Arjun Kumar", student_id: "GALS20240001", status: "present" },
-  { id: 2, name: "Hridhya Shukla", student_id: "GALS20240002", status: "present" },
-  { id: 3, name: "Rohan Mehta", student_id: "GALS20240003", status: "absent" },
-  { id: 4, name: "Sneha Patel", student_id: "GALS20240004", status: "late" },
-  { id: 5, name: "Vikram Singh", student_id: "GALS20240005", status: "present" },
-  { id: 6, name: "Ananya Rao", student_id: "GALS20240006", status: "present" },
-];
-
 const statusConfig = {
   present: { label: "Present", color: "bg-green-100 text-green-700 border-green-200", icon: CheckCircle, iconColor: "text-green-500" },
   absent: { label: "Absent", color: "bg-red-100 text-red-700 border-red-200", icon: XCircle, iconColor: "text-red-500" },
@@ -32,7 +23,7 @@ const statusConfig = {
 };
 
 export default function AttendancePage() {
-  const [students, setStudents] = useState<Student[]>(mockStudents);
+  const [students, setStudents] = useState<Student[]>([]);
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split("T")[0]);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);

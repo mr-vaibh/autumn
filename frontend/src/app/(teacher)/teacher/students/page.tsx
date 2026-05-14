@@ -16,12 +16,6 @@ interface Student {
   is_active: boolean;
 }
 
-const mockStudents: Student[] = [
-  { id: 1, name: "Arjun Kumar", student_id: "GALS20240001", age: 9, autism_level: "Level1", is_active: true },
-  { id: 2, name: "Hridhya Shukla", student_id: "GALS20240002", age: 11, autism_level: "Level2", is_active: true },
-  { id: 3, name: "Rohan Mehta", student_id: "GALS20240003", age: 10, autism_level: "Level1", is_active: true },
-];
-
 const levelColors: Record<string, string> = {
   Level1: "bg-neutral-100 text-neutral-800",
   Level2: "bg-yellow-100 text-yellow-700",
@@ -35,7 +29,7 @@ export default function TeacherStudentsPage() {
   useEffect(() => {
     studentsApi.getAll()
       .then((res) => setStudents(res.data.results || res.data))
-      .catch(() => setStudents(mockStudents))
+      .catch(() => setStudents([]))
       .finally(() => setLoading(false));
   }, []);
 

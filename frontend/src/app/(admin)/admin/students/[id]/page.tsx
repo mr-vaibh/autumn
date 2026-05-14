@@ -64,28 +64,6 @@ interface FoundUser {
   email: string;
 }
 
-const mockStudent: Student = {
-  id: 1,
-  name: "Arjun Kumar",
-  student_id: "GALS20240001",
-  date_of_birth: "2015-03-15",
-  age: 9,
-  autism_level: "Level1",
-  diagnosis: "Autism Spectrum Disorder with ADHD tendencies. Shows strong visual learning capabilities.",
-  is_active: true,
-  enrollment_date: "2023-06-01",
-  medical_notes: "Takes Risperidone 0.5mg in the morning. Allergic to penicillin. Regular OT and speech therapy sessions recommended.",
-  emergency_contact_name: "Suresh Kumar",
-  emergency_contact_phone: "+91 98765 43210",
-  emergency_contact_relation: "Father",
-  blood_group: "O+",
-  allergies: "Penicillin, certain food dyes",
-  parents: [
-    { id: 1, parent_name: "Suresh Kumar", parent_email: "suresh@example.com", parent_phone: "+91 98765 43210", relationship: "father", is_primary: true },
-    { id: 2, parent_name: "Meena Kumar", parent_email: "meena@example.com", parent_phone: "+91 98765 43211", relationship: "mother", is_primary: false },
-  ],
-};
-
 export default function StudentDetailPage() {
   const params = useParams();
   const [student, setStudent] = useState<Student | null>(null);
@@ -141,7 +119,7 @@ export default function StudentDetailPage() {
   const fetchStudent = () => {
     studentsApi.get(studentId)
       .then((res) => setStudent(res.data))
-      .catch(() => setStudent(mockStudent))
+      .catch(() => setStudent(null))
       .finally(() => setLoading(false));
   };
 

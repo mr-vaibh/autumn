@@ -7,44 +7,30 @@ import { Send, MessageSquare } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import toast from "react-hot-toast";
 
-const mockThreads = [
-  {
-    id: "thread-1",
-    teacher: { id: 1, name: "Sarthak Nehra", role: "TEACHER", subject: "Speech Therapist" },
-    lastMessage: "Arjun did great in today's session! He named 8 objects correctly.",
-    lastMessageAt: "2024-05-22T14:30:00Z",
-    unreadCount: 1,
-  },
-  {
-    id: "thread-2",
-    teacher: { id: 2, name: "Rahul Kumar", role: "THERAPIST", subject: "Occupational Therapist" },
-    lastMessage: "Please ensure Arjun practices the pincer grip exercises at home.",
-    lastMessageAt: "2024-05-21T10:00:00Z",
-    unreadCount: 0,
-  },
-  {
-    id: "thread-3",
-    teacher: { id: 3, name: "Admin", role: "ADMIN", subject: "School Admin" },
-    lastMessage: "Reminder: Parent-teacher meeting on June 8th at 10 AM.",
-    lastMessageAt: "2024-05-20T09:00:00Z",
-    unreadCount: 0,
-  },
-];
+type Thread = {
+  id: string;
+  teacher: { id: number; name: string; role: string; subject: string };
+  lastMessage: string;
+  lastMessageAt: string;
+  unreadCount: number;
+};
 
-const mockMessages = [
-  { id: 1, sender: "teacher", content: "Good morning! Arjun did exceptionally well today. He named 8 out of 10 objects in the picture book.", time: "2024-05-22T14:30:00Z", read: true },
-  { id: 2, sender: "parent", content: "That's wonderful news! He was practicing at home with the flash cards you suggested.", time: "2024-05-22T14:45:00Z", read: true },
-  { id: 3, sender: "teacher", content: "That really shows! Home practice makes a big difference. Please continue with the consonant sound exercises.", time: "2024-05-22T15:00:00Z", read: false },
-];
+type Message = {
+  id: number;
+  sender: string;
+  content: string;
+  time: string;
+  read: boolean;
+};
 
 export default function ParentCommunicationPage() {
-  const [selectedThread, setSelectedThread] = useState(mockThreads[0]);
-  const [messages, setMessages] = useState(mockMessages);
+  const [selectedThread, setSelectedThread] = useState<Thread | null>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const [sending, setSending] = useState(false);
 
   const sendMessage = async () => {
-    if (!newMessage.trim()) return;
+    if (!newMessage.trim() || !selectedThread) return;
     setSending(true);
     try {
       await communicationApi.sendMessage({
@@ -61,7 +47,6 @@ export default function ParentCommunicationPage() {
       }]);
       setNewMessage("");
     } catch {
-      // Mock add
       setMessages((prev) => [...prev, {
         id: Date.now(),
         sender: "parent",
@@ -89,89 +74,74 @@ export default function ParentCommunicationPage() {
             <h3 className="font-semibold text-gray-900">Conversations</h3>
           </div>
           <div className="flex-1 overflow-y-auto divide-y divide-gray-50">
-            {mockThreads.map((thread) => (
-              <button
-                key={thread.id}
-                onClick={() => setSelectedThread(thread)}
-                className={`w-full p-4 text-left hover:bg-gray-50 transition-colors ${
-                  selectedThread.id === thread.id ? "bg-neutral-100 border-l-2 border-neutral-300" : ""
-                }`}
-              >
-                <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 bg-neutral-100 rounded-full flex items-center justify-center text-sm font-bold text-neutral-800 flex-shrink-0">
-                    {thread.teacher.name.charAt(0)}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between">
-                      <p className="font-semibold text-gray-900 text-sm truncate">{thread.teacher.name}</p>
-                      {thread.unreadCount > 0 && (
-                        <span className="w-5 h-5 bg-neutral-100 text-white text-xs rounded-full flex items-center justify-center flex-shrink-0">
-                          {thread.unreadCount}
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-xs text-gray-400">{thread.teacher.subject}</p>
-                    <p className="text-xs text-gray-500 mt-1 truncate">{thread.lastMessage}</p>
-                  </div>
-                </div>
-              </button>
-            ))}
+            <div className="flex items-center justify-center h-32 text-gray-400 text-sm">
+              No conversations yet
+            </div>
           </div>
         </div>
 
         {/* Message Area */}
         <div className="lg:col-span-2 bg-white rounded-xl border border-gray-100 shadow-sm flex flex-col overflow-hidden">
-          {/* Header */}
-          <div className="p-4 border-b border-gray-100 flex items-center gap-3">
-            <div className="w-10 h-10 bg-neutral-100 rounded-full flex items-center justify-center text-sm font-bold text-neutral-800">
-              {selectedThread.teacher.name.charAt(0)}
-            </div>
-            <div>
-              <p className="font-semibold text-gray-900">{selectedThread.teacher.name}</p>
-              <p className="text-xs text-gray-400">{selectedThread.teacher.subject}</p>
-            </div>
-          </div>
-
-          {/* Messages */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4">
-            {messages.map((msg) => (
-              <div key={msg.id} className={`flex ${msg.sender === "parent" ? "justify-end" : "justify-start"}`}>
-                <div
-                  className={`max-w-xs lg:max-w-sm px-4 py-3 rounded-2xl text-sm leading-relaxed ${
-                    msg.sender === "parent"
-                      ? "bg-neutral-100 text-white rounded-tr-none"
-                      : "bg-gray-100 text-gray-800 rounded-tl-none"
-                  }`}
-                >
-                  <p>{msg.content}</p>
-                  <p className={`text-xs mt-1 ${msg.sender === "parent" ? "text-neutral-800" : "text-gray-400"}`}>
-                    {new Date(msg.time).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}
-                  </p>
+          {selectedThread ? (
+            <>
+              {/* Header */}
+              <div className="p-4 border-b border-gray-100 flex items-center gap-3">
+                <div className="w-10 h-10 bg-neutral-100 rounded-full flex items-center justify-center text-sm font-bold text-neutral-800">
+                  {selectedThread.teacher.name.charAt(0)}
+                </div>
+                <div>
+                  <p className="font-semibold text-gray-900">{selectedThread.teacher.name}</p>
+                  <p className="text-xs text-gray-400">{selectedThread.teacher.subject}</p>
                 </div>
               </div>
-            ))}
-          </div>
 
-          {/* Input */}
-          <div className="p-4 border-t border-gray-100">
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={newMessage}
-                onChange={(e) => setNewMessage(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && sendMessage()}
-                placeholder="Type your message..."
-                className="flex-1 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-neutral-400"
-              />
-              <Button
-                onClick={sendMessage}
-                disabled={sending || !newMessage.trim()}
-                className="bg-black hover:bg-neutral-800 text-white h-10 w-10 p-0"
-              >
-                <Send className="w-4 h-4" />
-              </Button>
+              {/* Messages */}
+              <div className="flex-1 overflow-y-auto p-4 space-y-4">
+                {messages.map((msg) => (
+                  <div key={msg.id} className={`flex ${msg.sender === "parent" ? "justify-end" : "justify-start"}`}>
+                    <div
+                      className={`max-w-xs lg:max-w-sm px-4 py-3 rounded-2xl text-sm leading-relaxed ${
+                        msg.sender === "parent"
+                          ? "bg-neutral-100 text-white rounded-tr-none"
+                          : "bg-gray-100 text-gray-800 rounded-tl-none"
+                      }`}
+                    >
+                      <p>{msg.content}</p>
+                      <p className={`text-xs mt-1 ${msg.sender === "parent" ? "text-neutral-800" : "text-gray-400"}`}>
+                        {new Date(msg.time).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Input */}
+              <div className="p-4 border-t border-gray-100">
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={newMessage}
+                    onChange={(e) => setNewMessage(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && sendMessage()}
+                    placeholder="Type your message..."
+                    className="flex-1 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-neutral-400"
+                  />
+                  <Button
+                    onClick={sendMessage}
+                    disabled={sending || !newMessage.trim()}
+                    className="bg-black hover:bg-neutral-800 text-white h-10 w-10 p-0"
+                  >
+                    <Send className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+            </>
+          ) : (
+            <div className="flex-1 flex items-center justify-center flex-col gap-3 text-gray-400">
+              <MessageSquare className="w-12 h-12 text-gray-200" />
+              <p className="text-sm">Select a conversation to view messages</p>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </div>

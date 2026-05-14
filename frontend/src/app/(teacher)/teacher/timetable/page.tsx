@@ -18,15 +18,6 @@ interface Period {
   room: string | null;
 }
 
-const mockPeriods: Period[] = [
-  { id: 1, subject: "Speech Therapy", class_name: "Level 1 - A", section_name: "Morning", day_of_week: 0, start_time: "09:00", end_time: "10:00", color: "#7C3AED", room: "Room 1" },
-  { id: 2, subject: "OT Session", class_name: "Level 2 - A", section_name: "Morning", day_of_week: 0, start_time: "10:30", end_time: "11:30", color: "#2563EB", room: "OT Room" },
-  { id: 3, subject: "Sensory Integration", class_name: "Level 1 - A", section_name: "Morning", day_of_week: 1, start_time: "09:00", end_time: "10:00", color: "#059669", room: "Sensory Room" },
-  { id: 4, subject: "Speech Therapy", class_name: "Level 3 - A", section_name: "Morning", day_of_week: 2, start_time: "09:00", end_time: "10:00", color: "#7C3AED", room: "Room 1" },
-  { id: 5, subject: "ABA Therapy", class_name: "Level 2 - B", section_name: "Afternoon", day_of_week: 3, start_time: "14:00", end_time: "15:30", color: "#DC2626", room: "ABA Room" },
-  { id: 6, subject: "Music Therapy", class_name: "Level 1 - A", section_name: "Morning", day_of_week: 4, start_time: "11:00", end_time: "12:00", color: "#8B5CF6", room: "Music Room" },
-];
-
 export default function TeacherTimetablePage() {
   const [periods, setPeriods] = useState<Period[]>([]);
   const [loading, setLoading] = useState(true);
@@ -35,7 +26,7 @@ export default function TeacherTimetablePage() {
   useEffect(() => {
     timetableApi.getPeriods()
       .then((res) => setPeriods(res.data.results || res.data))
-      .catch(() => setPeriods(mockPeriods))
+      .catch(() => setPeriods([]))
       .finally(() => setLoading(false));
   }, []);
 

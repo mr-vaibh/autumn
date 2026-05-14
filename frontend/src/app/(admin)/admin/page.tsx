@@ -10,24 +10,6 @@ import {
   ResponsiveContainer, LineChart, Line,
 } from "recharts";
 
-const mockAttendanceData = [
-  { month: "Jan", present: 85, absent: 15 },
-  { month: "Feb", present: 88, absent: 12 },
-  { month: "Mar", present: 82, absent: 18 },
-  { month: "Apr", present: 91, absent: 9 },
-  { month: "May", present: 87, absent: 13 },
-  { month: "Jun", present: 94, absent: 6 },
-];
-
-const mockProgressData = [
-  { month: "Jan", avg: 3.2 },
-  { month: "Feb", avg: 3.4 },
-  { month: "Mar", avg: 3.1 },
-  { month: "Apr", avg: 3.6 },
-  { month: "May", avg: 3.8 },
-  { month: "Jun", avg: 4.1 },
-];
-
 const recentActivities = [
   { id: 1, text: "Session report submitted for Aryan Mehta - Speech Therapy", time: "10 min ago", color: "bg-neutral-100" },
   { id: 2, text: "Fee payment received - Hridhya Shukla (₹8,500)", time: "25 min ago", color: "bg-green-500" },
@@ -93,7 +75,7 @@ export default function AdminDashboard() {
             <h3 className="font-semibold text-gray-900 mb-1">Monthly Attendance Trend</h3>
             <p className="text-xs text-gray-400 mb-4">Student attendance over the last 6 months</p>
             <ResponsiveContainer width="100%" height={220}>
-              <BarChart data={mockAttendanceData}>
+              <BarChart data={[]}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                 <XAxis dataKey="month" tick={{ fontSize: 12 }} />
                 <YAxis tick={{ fontSize: 12 }} />
@@ -108,7 +90,7 @@ export default function AdminDashboard() {
             <h3 className="font-semibold text-gray-900 mb-1">Average Therapy Progress</h3>
             <p className="text-xs text-gray-400 mb-4">Average improvement level (1–5 scale)</p>
             <ResponsiveContainer width="100%" height={220}>
-              <LineChart data={mockProgressData}>
+              <LineChart data={[]}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                 <XAxis dataKey="month" tick={{ fontSize: 12 }} />
                 <YAxis domain={[0, 5]} tick={{ fontSize: 12 }} />

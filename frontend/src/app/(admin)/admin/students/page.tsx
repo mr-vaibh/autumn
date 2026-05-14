@@ -26,15 +26,6 @@ interface Student {
   diagnosis?: string;
 }
 
-const mockStudents: Student[] = [
-  { id: 1, name: "Arjun Kumar", student_id: "GALS20240001", date_of_birth: "2015-03-15", age: 9, autism_level: "Level1", is_active: true, enrollment_date: "2023-06-01", diagnosis: "ASD with ADHD" },
-  { id: 2, name: "Hridhya Shukla", student_id: "GALS20240002", date_of_birth: "2013-07-22", age: 11, autism_level: "Level2", is_active: true, enrollment_date: "2023-04-15", diagnosis: "Autism Spectrum Disorder" },
-  { id: 3, name: "Rohan Mehta", student_id: "GALS20240003", date_of_birth: "2014-11-08", age: 10, autism_level: "Level1", is_active: true, enrollment_date: "2024-01-10", diagnosis: "High-functioning ASD" },
-  { id: 4, name: "Sneha Patel", student_id: "GALS20240004", date_of_birth: "2012-05-30", age: 12, autism_level: "Level3", is_active: true, enrollment_date: "2022-09-01", diagnosis: "ASD Level 3" },
-  { id: 5, name: "Vikram Singh", student_id: "GALS20240005", date_of_birth: "2016-01-12", age: 8, autism_level: "Level2", is_active: true, enrollment_date: "2024-03-15", diagnosis: "ASD with speech delay" },
-  { id: 6, name: "Ananya Rao", student_id: "GALS20240006", date_of_birth: "2015-08-25", age: 9, autism_level: "Level1", is_active: false, enrollment_date: "2023-01-20", diagnosis: "Asperger Syndrome" },
-];
-
 const levelColors: Record<string, "purple" | "warning" | "danger"> = {
   Level1: "purple",
   Level2: "warning",
@@ -98,7 +89,7 @@ export default function StudentsPage() {
     studentsApi.getAll()
       .then((res) => setStudents(res.data.results || res.data))
       .catch(() => {
-        setStudents(mockStudents);
+        setStudents([]);
       })
       .finally(() => setLoading(false));
   };

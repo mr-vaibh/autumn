@@ -20,13 +20,6 @@ interface SessionReport {
   general_notes?: string;
 }
 
-const mockSessions: SessionReport[] = [
-  { id: 1, period_subject: "Speech Therapy", class_name: "Level 1 - A", date: "2024-05-22", status: "completed", improvement_level: 4, teacher_name: "Sarthak Nehra", activity_done: "Practiced consonant sounds with picture cards. Used repetition and visual cues.", student_response: "Arjun responded positively. Successfully pronounced 8 out of 10 target words.", behavior_notes: "Good behavior throughout. Sat focused for full 45 minutes.", general_notes: "Significant improvement from last week. Continue with consonant blend exercises." },
-  { id: 2, period_subject: "Occupational Therapy", class_name: "Level 1 - A", date: "2024-05-20", status: "completed", improvement_level: 3, teacher_name: "Rahul Kumar", activity_done: "Fine motor exercises: Threading beads, playdough activities, scissor work.", student_response: "Needed some assistance with scissor grip but completed all tasks with moderate support.", behavior_notes: "Some hyperactivity noted. Took short sensory break which helped.", general_notes: "Continue fine motor exercises. Introduce bilateral coordination activities next week." },
-  { id: 3, period_subject: "Sensory Integration", class_name: "Level 1 - A", date: "2024-05-19", status: "completed", improvement_level: 5, teacher_name: "Anita Sharma", activity_done: "Sensory bin activities, swing therapy, tactile stimulation.", student_response: "Excellent engagement! Arjun sought out the sensory activities independently.", behavior_notes: "Very calm and focused after sensory activities. No challenging behaviors.", general_notes: "Best session this month! He is responding very well to sensory diet." },
-  { id: 4, period_subject: "Speech Therapy", class_name: "Level 1 - A", date: "2024-05-17", status: "skipped", improvement_level: null, teacher_name: "Sarthak Nehra", general_notes: "Session skipped due to student absence." },
-];
-
 function StarRating({ rating }: { rating: number | null }) {
   if (!rating) return <span className="text-gray-300 text-xs italic">Not rated</span>;
   return (
@@ -50,7 +43,7 @@ export default function ParentSessionsPage() {
   useEffect(() => {
     sessionsApi.getAll()
       .then((res) => setSessions(res.data.results || res.data))
-      .catch(() => setSessions(mockSessions))
+      .catch(() => setSessions([]))
       .finally(() => setLoading(false));
   }, []);
 

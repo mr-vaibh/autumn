@@ -23,12 +23,6 @@ interface Announcement {
   created_at: string;
 }
 
-const mockAnnouncements: Announcement[] = [
-  { id: 1, title: "Annual Day Celebrations - 2024", body: "Dear parents and staff, we are pleased to announce our Annual Day celebration on June 15th, 2024.", created_by_name: "Admin", target: "all", is_active: true, is_pinned: true, created_at: "2024-05-20T10:00:00Z" },
-  { id: 2, title: "Summer Schedule Changes", body: "Please note that due to the summer vacation, class schedules will be modified from June 1st.", created_by_name: "Admin", target: "parents", is_active: true, is_pinned: false, created_at: "2024-05-18T14:30:00Z" },
-  { id: 3, title: "Staff Meeting - May 30th", body: "All teaching staff are reminded about the monthly staff meeting scheduled for May 30th at 4:00 PM.", created_by_name: "Admin", target: "teachers", is_active: true, is_pinned: false, created_at: "2024-05-17T09:00:00Z" },
-];
-
 const targetColors: Record<string, "purple" | "info" | "success"> = {
   all: "purple",
   teachers: "info",
@@ -59,7 +53,7 @@ export default function CommunicationPage() {
     setLoading(true);
     communicationApi.getAnnouncements()
       .then((res) => setAnnouncements(res.data.results || res.data))
-      .catch(() => setAnnouncements(mockAnnouncements))
+      .catch(() => setAnnouncements([]))
       .finally(() => setLoading(false));
   };
 
