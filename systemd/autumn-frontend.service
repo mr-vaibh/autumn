@@ -1,0 +1,19 @@
+[Unit]
+Description=Autumn Next.js Frontend
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/root/autumn/frontend/.next/standalone
+EnvironmentFile=/root/autumn/.env
+Environment=NODE_ENV=production
+Environment=PORT=3000
+ExecStart=/usr/bin/node server.js
+Restart=always
+RestartSec=5
+StandardOutput=append:/root/autumn/logs/frontend.log
+StandardError=append:/root/autumn/logs/frontend.log
+
+[Install]
+WantedBy=multi-user.target

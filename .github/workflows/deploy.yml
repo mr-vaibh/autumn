@@ -15,10 +15,9 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          command_timeout: 30m
           script: |
             cd ~/autumn
             git pull origin main
-            docker compose up -d --build
-            docker compose exec -T backend python manage.py migrate --noinput
-            docker compose exec -T backend python manage.py collectstatic --noinput
-            docker image prune -f
+            chmod +x scripts/deploy.sh
+            bash scripts/deploy.sh

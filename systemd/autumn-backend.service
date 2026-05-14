@@ -1,0 +1,20 @@
+[Unit]
+Description=Autumn Django Backend
+After=network.target postgresql.service redis.service
+Requires=postgresql.service redis.service
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/root/autumn/backend
+EnvironmentFile=/root/autumn/.env
+Environment=DJANGO_SETTINGS_MODULE=config.settings.production
+Environment=DB_HOST=localhost
+ExecStart=/root/autumn/venv/bin/gunicorn config.wsgi:application --bind 127.0.0.1:8000 --workers 3 --timeout 120
+Restart=always
+RestartSec=5
+StandardOutput=append:/root/autumn/logs/backend.log
+StandardError=append:/root/autumn/logs/backend.log
+
+[Install]
+WantedBy=multi-user.target
