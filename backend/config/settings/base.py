@@ -172,12 +172,13 @@ SPECTACULAR_SETTINGS = {
     'SERVE_INCLUDE_SCHEMA': False,
 }
 
+_extra_origins = config('CORS_ALLOWED_ORIGINS', default='').split(',')
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
     'http://localhost:80',
     'http://localhost',
     'http://127.0.0.1:3000',
-]
+] + [o.strip() for o in _extra_origins if o.strip()]
 
 CORS_ALLOW_CREDENTIALS = True
 
