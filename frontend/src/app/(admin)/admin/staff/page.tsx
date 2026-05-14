@@ -61,8 +61,11 @@ export default function StaffPage() {
 
   const fetchStaff = () => {
     setLoading(true);
-    usersApi.getAll({ role: "TEACHER" })
-      .then((res) => setStaff(res.data.results || res.data))
+    usersApi.getAll()
+      .then((res) => {
+        const all = res.data.results || res.data;
+        setStaff(all.filter((u: Staff) => u.role !== "ADMIN" && u.role !== "PARENT"));
+      })
       .catch(() => setStaff(mockStaff))
       .finally(() => setLoading(false));
   };
