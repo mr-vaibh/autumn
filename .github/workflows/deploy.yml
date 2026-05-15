@@ -18,6 +18,6 @@ jobs:
           command_timeout: 30m
           script: |
             cd ~/autumn
-            git pull origin main
-            chmod +x scripts/deploy.sh
+            git fetch origin main
+            git reset --hard origin/main
             bash scripts/deploy.sh
