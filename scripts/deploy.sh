@@ -35,4 +35,14 @@ cd ..
 echo "==> Restarting backend"
 systemctl restart autumn-backend
 
+echo "==> Installing chores (idempotent)"
+
+# DB backup cron — daily at 2 AM
+CRON_JOB="0 2 * * * bash /root/autumn/scripts/db_backup.sh >> /root/autumn/logs/backup.log 2>&1"
+( crontab -l 2>/dev/null | grep -qF "db_backup.sh" ) \
+  || ( crontab -l 2>/dev/null; echo "$CRON_JOB" ) | crontab -
+
+# Log rotation
+cp "$APP_DIR/config/logrotate-autumn.conf" /etc/logrotate.d/autumn
+
 echo "==> Done"
