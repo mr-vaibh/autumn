@@ -53,18 +53,18 @@ jobs:
 
       - name: Sync to server
         env:
-          SERVER: ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}
-          RSYNC: rsync -az -e "ssh -i ~/.ssh/deploy_key"
-          REMOTE: ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:~/autumn/frontend/.next/standalone
+          DEST: ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:~/autumn/frontend/.next/standalone
         run: |
+          R="rsync -az -e 'ssh -i ~/.ssh/deploy_key'"
+
           # node_modules — no delete, too large to risk partial wipe
-          $RSYNC frontend/.next/standalone/node_modules/ $REMOTE/node_modules/
+          eval "$R frontend/.next/standalone/node_modules/ $DEST/node_modules/"
 
           # entry point
-          $RSYNC frontend/.next/standalone/server.js frontend/.next/standalone/package.json $REMOTE/
+          eval "$R frontend/.next/standalone/server.js frontend/.next/standalone/package.json $DEST/"
 
           # manifests
-          $RSYNC \
+          eval "$R \
             frontend/.next/standalone/.next/BUILD_ID \
             frontend/.next/standalone/.next/app-build-manifest.json \
             frontend/.next/standalone/.next/app-path-routes-manifest.json \
@@ -75,14 +75,14 @@ jobs:
             frontend/.next/standalone/.next/react-loadable-manifest.json \
             frontend/.next/standalone/.next/required-server-files.json \
             frontend/.next/standalone/.next/routes-manifest.json \
-            $REMOTE/.next/
+            $DEST/.next/"
 
           # server-side page bundles
-          $RSYNC --delete frontend/.next/standalone/.next/server/ $REMOTE/.next/server/
+          eval "$R --delete frontend/.next/standalone/.next/server/ $DEST/.next/server/"
 
           # static assets and public
-          $RSYNC --delete frontend/.next/static/ $REMOTE/.next/static/
-          $RSYNC --delete frontend/public/ $REMOTE/public/
+          eval "$R --delete frontend/.next/static/ $DEST/.next/static/"
+          eval "$R --delete frontend/public/ $DEST/public/"
 
       - name: Restart frontend
         uses: appleboy/ssh-action@v1.2.0
