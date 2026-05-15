@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 const { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, Legend } = require("recharts");
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { TrendingUp, Users, Calendar } from "lucide-react";
+import { TrendingUp, Users, Calendar, BarChart2, PieChart as PieChartIcon, LayoutDashboard } from "lucide-react";
 import { reportsApi } from "@/lib/api";
 
 interface MonthlyAttendance {
@@ -32,6 +32,15 @@ const SESSION_COLORS: Record<string, string> = {
   pending: "#F59E0B",
   skipped: "#9CA3AF",
 };
+
+function NoData({ icon: Icon, label }: { icon: React.ElementType; label: string }) {
+  return (
+    <div className="flex flex-col items-center justify-center py-12 gap-3">
+      <Icon className="w-16 h-16 text-gray-200 stroke-1" />
+      <p className="text-sm text-gray-400 font-medium">{label}</p>
+    </div>
+  );
+}
 
 export default function ReportsPage() {
   const [attendanceTrend, setAttendanceTrend] = useState<MonthlyAttendance[]>([]);
@@ -96,7 +105,7 @@ export default function ReportsPage() {
               <div className="lg:col-span-2 bg-white rounded-xl border border-gray-100 shadow-sm p-6">
                 <h3 className="font-semibold text-gray-900 mb-4">Monthly Attendance</h3>
                 {attendanceChartData.length === 0 ? (
-                  <p className="text-sm text-gray-400 text-center py-16">No attendance records yet</p>
+                  <NoData icon={BarChart2} label="Not enough data to display" />
                 ) : (
                   <ResponsiveContainer width="100%" height={280}>
                     <BarChart data={attendanceChartData}>
@@ -115,7 +124,7 @@ export default function ReportsPage() {
               <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
                 <h3 className="font-semibold text-gray-900 mb-4">Session Status</h3>
                 {sessionStatus.length === 0 ? (
-                  <p className="text-sm text-gray-400 text-center py-16">No session data yet</p>
+                  <NoData icon={PieChartIcon} label="Not enough data to display" />
                 ) : (
                   <ResponsiveContainer width="100%" height={200}>
                     <PieChart>
@@ -141,7 +150,7 @@ export default function ReportsPage() {
             <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 max-w-md">
               <h3 className="font-semibold text-gray-900 mb-4">Quick Summary</h3>
               {!dashboardStats ? (
-                <p className="text-sm text-gray-400">No data available</p>
+                <NoData icon={LayoutDashboard} label="Not enough data to display" />
               ) : (
                 <div className="space-y-4">
                   {[
