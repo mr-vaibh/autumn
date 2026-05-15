@@ -35,6 +35,10 @@ cd ..
 echo "==> Restarting backend"
 systemctl restart autumn-backend
 
+echo "==> Updating nginx config"
+cp "$APP_DIR/nginx/nginx.conf" /etc/nginx/nginx.conf
+nginx -t && systemctl reload nginx
+
 echo "==> Installing chores (idempotent)"
 
 # DB backup cron — daily at 2 AM
