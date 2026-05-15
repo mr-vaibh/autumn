@@ -77,6 +77,8 @@ export default function ReportsPage() {
     present: m.present,
     absent: m.total - m.present,
   }));
+  const hasAttendanceData = attendanceChartData.some((m) => m.present > 0 || m.absent > 0);
+  const hasSessionData = sessionStatus.some((s) => s.value > 0);
 
   return (
     <div className="space-y-6">
@@ -104,7 +106,7 @@ export default function ReportsPage() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
               <div className="lg:col-span-2 bg-white rounded-xl border border-gray-100 shadow-sm p-6">
                 <h3 className="font-semibold text-gray-900 mb-4">Monthly Attendance</h3>
-                {attendanceChartData.length === 0 ? (
+                {!hasAttendanceData ? (
                   <NoData icon={BarChart2} label="Not enough data to display" />
                 ) : (
                   <ResponsiveContainer width="100%" height={280}>
@@ -123,7 +125,7 @@ export default function ReportsPage() {
 
               <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
                 <h3 className="font-semibold text-gray-900 mb-4">Session Status</h3>
-                {sessionStatus.length === 0 ? (
+                {!hasSessionData ? (
                   <NoData icon={PieChartIcon} label="Not enough data to display" />
                 ) : (
                   <ResponsiveContainer width="100%" height={200}>
