@@ -592,6 +592,7 @@ export function Header() {
 
   const [notifCount, setNotifCount] = useState(0);
   const [dynamicResults, setDynamicResults] = useState<{ label: string; path: string; subtitle?: string }[]>([]);
+  const [isMac, setIsMac] = useState(true);
 
   // Dialog open states
   const [searchOpen, setSearchOpen] = useState(false);
@@ -661,7 +662,11 @@ export function Header() {
       });
   }, []);
 
-  // ⌘K shortcut
+  useEffect(() => {
+    setIsMac(/Mac|iPhone|iPad|iPod/.test(navigator.platform));
+  }, []);
+
+  // ⌘K / Ctrl+K shortcut
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
       if ((e.metaKey || e.ctrlKey) && e.key === "k") {
@@ -704,7 +709,7 @@ export function Header() {
             <Search className="w-4 h-4" />
             <span>Quick search...</span>
             <kbd className="ml-2 text-xs bg-gray-200 px-1.5 py-0.5 rounded">
-              ⌘K
+              {isMac ? "⌘K" : "Ctrl K"}
             </kbd>
           </button>
 
