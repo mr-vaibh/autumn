@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { StatsCard } from "@/components/shared/StatsCard";
-import { CreditCard, AlertTriangle, CheckCircle, Plus, Zap, Trash2 } from "lucide-react";
+import { CreditCard, AlertTriangle, CheckCircle, Plus, Zap, Trash2, Pencil } from "lucide-react";
 import { formatDate, formatCurrency } from "@/lib/utils";
 import toast from "react-hot-toast";
 
@@ -60,6 +60,11 @@ export default function FeesPage() {
   const [createStructureOpen, setCreateStructureOpen] = useState(false);
   const [newStructure, setNewStructure] = useState({ name: "", amount: "", frequency: "monthly", description: "" });
   const [creatingStructure, setCreatingStructure] = useState(false);
+
+  // Edit structure
+  const [editStructure, setEditStructure] = useState<FeeStructure | null>(null);
+  const [editForm, setEditForm] = useState({ name: "", amount: "", frequency: "monthly", description: "" });
+  const [savingStructure, setSavingStructure] = useState(false);
 
   // Generate dialog
   const [generateFor, setGenerateFor] = useState<FeeStructure | null>(null);
@@ -122,6 +127,30 @@ export default function FeesPage() {
       toast.error(msg as string);
     } finally {
       setCreatingStructure(false);
+    }
+  };
+
+  // ── Edit structure ──────────────────────────────────────────────────────────
+  const openEditStructure = (s: FeeStructure) => {
+    setEditStructure(s);
+    setEditForm({ name: s.name, amount: String(s.amount), frequency: s.frequency, description: s.description || "" });
+  };
+
+  const handleEditStructure = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editStructure || !editForm.name || !editForm.amount) { toast.error("Name and amount are required"); return; }
+    setSavingStructure(true);
+    try {
+      await feesApi.updateStructure(editStructure.id, { ...editForm, amount: Number(editForm.amount) });
+      toast.success("Fee structure updated");
+      setEditStructure(null);
+      fetchStructures();
+    } catch (err: unknown) {
+      const e = err as { response?: { data?: Record<string, string[]> } };
+      const msg = e.response?.data ? Object.values(e.response.data).flat()[0] : "Failed to update";
+      toast.error(msg as string);
+    } finally {
+      setSavingStructure(false);
     }
   };
 
@@ -252,6 +281,9 @@ export default function FeesPage() {
                       <Zap className="w-3.5 h-3.5" />
                       Generate for all students
                     </Button>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-500 hover:text-gray-700 hover:bg-gray-100" onClick={() => openEditStructure(s)}>
+                      <Pencil className="w-4 h-4" />
+                    </Button>
                     <Button variant="ghost" size="icon" className="h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50" onClick={() => setDeleteStructure(s)}>
                       <Trash2 className="w-4 h-4" />
                     </Button>
@@ -302,6 +334,45 @@ export default function FeesPage() {
           </div>
         </TabsContent>
       </Tabs>
+
+      {/* Edit Structure Dialog */}
+      <Dialog open={!!editStructure} onOpenChange={(v) => { if (!v) setEditStructure(null); }}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader><DialogTitle>Edit Fee Structure</DialogTitle></DialogHeader>
+          <form onSubmit={handleEditStructure} className="space-y-4 mt-2">
+            <div className="space-y-1.5">
+              <Label htmlFor="ef-name">Name *</Label>
+              <Input id="ef-name" required placeholder="e.g. Monthly Therapy Fee" value={editForm.name} onChange={(e) => setEditForm({ ...editForm, name: e.target.value })} />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <Label htmlFor="ef-amount">Amount (₹) *</Label>
+                <Input id="ef-amount" type="number" min={0} required placeholder="8500" value={editForm.amount} onChange={(e) => setEditForm({ ...editForm, amount: e.target.value })} />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="ef-freq">Frequency</Label>
+                <select id="ef-freq" value={editForm.frequency} onChange={(e) => setEditForm({ ...editForm, frequency: e.target.value })} className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
+                  <option value="monthly">Monthly</option>
+                  <option value="quarterly">Quarterly</option>
+                  <option value="semi_annual">Semi-Annual</option>
+                  <option value="annual">Annual</option>
+                  <option value="one_time">One-Time</option>
+                </select>
+              </div>
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="ef-desc">Description</Label>
+              <Input id="ef-desc" placeholder="Optional description" value={editForm.description} onChange={(e) => setEditForm({ ...editForm, description: e.target.value })} />
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setEditStructure(null)}>Cancel</Button>
+              <Button type="submit" disabled={savingStructure} className="bg-black text-white hover:bg-neutral-800">
+                {savingStructure ? "Saving..." : "Save Changes"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
 
       {/* Create Structure Dialog */}
       <Dialog open={createStructureOpen} onOpenChange={(v) => { setCreateStructureOpen(v); if (!v) setNewStructure({ name: "", amount: "", frequency: "monthly", description: "" }); }}>

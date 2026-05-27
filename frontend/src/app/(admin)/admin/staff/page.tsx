@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Plus, Mail, Phone } from "lucide-react";
+import { Plus, Mail, Phone, Pencil, Trash2 } from "lucide-react";
 import toast from "react-hot-toast";
 import { formatDate } from "@/lib/utils";
 
@@ -33,23 +33,25 @@ const roleColors: Record<string, "purple" | "info" | "success" | "warning"> = {
   ADMIN: "warning",
 };
 
+const emptyForm = {
+  first_name: "", last_name: "", email: "", username: "",
+  role: "TEACHER", phone: "", designation: "", department: "",
+  password: "", confirm_password: "",
+};
+
 export default function StaffPage() {
   const [staff, setStaff] = useState<Staff[]>([]);
   const [loading, setLoading] = useState(true);
-  const [dialogOpen, setDialogOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [form, setForm] = useState({
-    first_name: "",
-    last_name: "",
-    email: "",
-    username: "",
-    role: "TEACHER",
-    phone: "",
-    designation: "",
-    department: "",
-    password: "",
-    confirm_password: "",
-  });
+
+  // Add / Edit
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editingStaff, setEditingStaff] = useState<Staff | null>(null);
+  const [form, setForm] = useState(emptyForm);
+
+  // Delete
+  const [deletingStaff, setDeletingStaff] = useState<Staff | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   const fetchStaff = () => {
     setLoading(true);
@@ -62,38 +64,82 @@ export default function StaffPage() {
       .finally(() => setLoading(false));
   };
 
-  useEffect(() => {
-    fetchStaff();
-  }, []);
+  useEffect(() => { fetchStaff(); }, []);
 
   const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const emptyForm = { first_name: "", last_name: "", email: "", username: "", role: "TEACHER", phone: "", designation: "", department: "", password: "", confirm_password: "" };
+  const openAdd = () => {
+    setEditingStaff(null);
+    setForm(emptyForm);
+    setDialogOpen(true);
+  };
 
-  const handleAddStaff = async () => {
-    if (!form.first_name || !form.last_name || !form.email || !form.username || !form.password) {
-      toast.error("Please fill in all required fields");
+  const openEdit = (s: Staff) => {
+    setEditingStaff(s);
+    setForm({
+      first_name: s.first_name,
+      last_name: s.last_name,
+      email: s.email,
+      username: "",
+      role: s.role,
+      phone: s.phone || "",
+      designation: s.designation || "",
+      department: s.department || "",
+      password: "",
+      confirm_password: "",
+    });
+    setDialogOpen(true);
+  };
+
+  const handleSubmit = async () => {
+    if (!form.first_name || !form.last_name || !form.email) {
+      toast.error("First name, last name and email are required");
       return;
     }
-    if (form.password !== form.confirm_password) {
+    if (!editingStaff && (!form.username || !form.password)) {
+      toast.error("Username and password are required");
+      return;
+    }
+    if (!editingStaff && form.password !== form.confirm_password) {
       toast.error("Passwords do not match");
       return;
     }
     setSubmitting(true);
     try {
-      await usersApi.create(form);
-      toast.success("Staff member added successfully");
+      if (editingStaff) {
+        const { password, confirm_password, username, ...updateData } = form;
+        void password; void confirm_password; void username;
+        await usersApi.update(editingStaff.id, updateData);
+        toast.success("Staff member updated");
+      } else {
+        await usersApi.create(form);
+        toast.success("Staff member added successfully");
+      }
       setDialogOpen(false);
-      setForm(emptyForm);
       fetchStaff();
     } catch (err: unknown) {
       const e = err as { response?: { data?: Record<string, string[]> } };
-      const msg = e.response?.data ? Object.values(e.response.data).flat()[0] : "Failed to add staff member";
+      const msg = e.response?.data ? Object.values(e.response.data).flat()[0] : "Failed to save staff member";
       toast.error(msg as string);
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!deletingStaff) return;
+    setDeleting(true);
+    try {
+      await usersApi.delete(deletingStaff.id);
+      toast.success("Staff member removed");
+      setDeletingStaff(null);
+      fetchStaff();
+    } catch {
+      toast.error("Failed to delete staff member");
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -117,9 +163,7 @@ export default function StaffPage() {
       key: "role",
       header: "Role",
       render: (row: Staff) => (
-        <Badge variant={roleColors[row.role] || "secondary"}>
-          {row.role}
-        </Badge>
+        <Badge variant={roleColors[row.role] || "secondary"}>{row.role}</Badge>
       ),
     },
     {
@@ -168,7 +212,7 @@ export default function StaffPage() {
           <h1 className="text-2xl font-bold text-gray-900">Staff Management</h1>
           <p className="text-sm text-gray-500 mt-0.5">{staff.length} staff members</p>
         </div>
-        <Button size="sm" className="gap-2 bg-black hover:bg-neutral-800 text-white" onClick={() => setDialogOpen(true)}>
+        <Button size="sm" className="gap-2 bg-black hover:bg-neutral-800 text-white" onClick={openAdd}>
           <Plus className="w-4 h-4" />
           Add Staff
         </Button>
@@ -197,13 +241,27 @@ export default function StaffPage() {
           searchKeys={["full_name" as keyof Record<string, unknown>, "email" as keyof Record<string, unknown>]}
           isLoading={loading}
           emptyMessage="No staff members found"
+          actions={(row) => {
+            const s = row as unknown as Staff;
+            return (
+              <div className="flex items-center gap-2 justify-end">
+                <Button size="sm" variant="outline" className="h-8 w-8 p-0" onClick={() => openEdit(s)} title="Edit">
+                  <Pencil className="w-3.5 h-3.5" />
+                </Button>
+                <Button size="sm" variant="outline" className="h-8 w-8 p-0 text-red-500 hover:text-red-700 hover:bg-red-50 border-red-200" onClick={() => setDeletingStaff(s)} title="Delete">
+                  <Trash2 className="w-3.5 h-3.5" />
+                </Button>
+              </div>
+            );
+          }}
         />
       </div>
 
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+      {/* Add / Edit Dialog */}
+      <Dialog open={dialogOpen} onOpenChange={(v) => { if (!v) setDialogOpen(false); }}>
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
-            <DialogTitle>Add Staff Member</DialogTitle>
+            <DialogTitle>{editingStaff ? "Edit Staff Member" : "Add Staff Member"}</DialogTitle>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-2 gap-4">
@@ -220,27 +278,28 @@ export default function StaffPage() {
               <Label htmlFor="email">Email *</Label>
               <Input id="email" name="email" type="email" value={form.email} onChange={handleFormChange} placeholder="email@autism.school" />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="username">Username *</Label>
-              <Input id="username" name="username" value={form.username} onChange={handleFormChange} placeholder="e.g. sarthak.nehra" />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="password">Password *</Label>
-                <Input id="password" name="password" type="password" value={form.password} onChange={handleFormChange} placeholder="Password" />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="confirm_password">Confirm Password *</Label>
-                <Input id="confirm_password" name="confirm_password" type="password" value={form.confirm_password} onChange={handleFormChange} placeholder="Repeat password" />
-              </div>
-            </div>
+            {!editingStaff && (
+              <>
+                <div className="space-y-2">
+                  <Label htmlFor="username">Username *</Label>
+                  <Input id="username" name="username" value={form.username} onChange={handleFormChange} placeholder="e.g. sarthak.nehra" />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="password">Password *</Label>
+                    <Input id="password" name="password" type="password" value={form.password} onChange={handleFormChange} placeholder="Password" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="confirm_password">Confirm Password *</Label>
+                    <Input id="confirm_password" name="confirm_password" type="password" value={form.confirm_password} onChange={handleFormChange} placeholder="Repeat password" />
+                  </div>
+                </div>
+              </>
+            )}
             <div className="space-y-2">
               <Label htmlFor="role">Role</Label>
               <select
-                id="role"
-                name="role"
-                value={form.role}
-                onChange={handleFormChange}
+                id="role" name="role" value={form.role} onChange={handleFormChange}
                 className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
               >
                 <option value="TEACHER">Teacher</option>
@@ -265,8 +324,24 @@ export default function StaffPage() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDialogOpen(false)}>Cancel</Button>
-            <Button className="bg-black text-white hover:bg-neutral-800" onClick={handleAddStaff} disabled={submitting}>
-              {submitting ? "Adding..." : "Add Staff"}
+            <Button className="bg-black text-white hover:bg-neutral-800" onClick={handleSubmit} disabled={submitting}>
+              {submitting ? "Saving..." : editingStaff ? "Save Changes" : "Add Staff"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation */}
+      <Dialog open={!!deletingStaff} onOpenChange={(v) => { if (!v) setDeletingStaff(null); }}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader><DialogTitle>Remove Staff Member</DialogTitle></DialogHeader>
+          <p className="text-sm text-gray-600 mt-1">
+            Remove <strong>{deletingStaff?.full_name}</strong> from the system? This cannot be undone.
+          </p>
+          <DialogFooter className="mt-4">
+            <Button variant="outline" onClick={() => setDeletingStaff(null)}>Cancel</Button>
+            <Button disabled={deleting} onClick={handleDelete} className="bg-red-600 hover:bg-red-700 text-white">
+              {deleting ? "Removing..." : "Remove"}
             </Button>
           </DialogFooter>
         </DialogContent>

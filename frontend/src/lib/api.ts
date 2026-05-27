@@ -155,8 +155,14 @@ export const classesApi = {
     api.post("/classes/", data),
   update: (id: number, data: Record<string, unknown>) =>
     api.patch(`/classes/${id}/`, data),
+  delete: (id: number) =>
+    api.delete(`/classes/${id}/`),
   getSections: (params?: Record<string, unknown>) =>
     api.get("/classes/sections/", { params }),
+  updateSection: (id: number, data: Record<string, unknown>) =>
+    api.patch(`/classes/sections/${id}/`, data),
+  deleteSection: (id: number) =>
+    api.delete(`/classes/sections/${id}/`),
   getAcademicYears: () =>
     api.get("/classes/academic-years/"),
   createAcademicYear: (data: Record<string, unknown>) =>
@@ -205,6 +211,8 @@ export const feesApi = {
     api.get("/fees/structures/"),
   createStructure: (data: Record<string, unknown>) =>
     api.post("/fees/structures/", data),
+  updateStructure: (id: number, data: Record<string, unknown>) =>
+    api.patch(`/fees/structures/${id}/`, data),
   deleteStructure: (id: number) =>
     api.delete(`/fees/structures/${id}/`),
   generateFees: (structureId: number, due_date: string) =>
