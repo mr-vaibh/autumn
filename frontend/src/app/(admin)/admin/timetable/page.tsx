@@ -34,6 +34,7 @@ export default function TimetablePage() {
   const [selectedDay, setSelectedDay] = useState<number | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [availableClasses, setAvailableClasses] = useState<{ id: number; name: string }[]>([]);
+  const [classesLoading, setClassesLoading] = useState(true);
   const [newPeriod, setNewPeriod] = useState({
     name: "",
     subject: "",
@@ -52,7 +53,8 @@ export default function TimetablePage() {
       .finally(() => setLoading(false));
     classesApi.getAll()
       .then((res) => setAvailableClasses(res.data.results || res.data))
-      .catch(() => {});
+      .catch(() => toast.error("Failed to load classes"))
+      .finally(() => setClassesLoading(false));
   }, []);
 
   const fetchPeriods = () => {
@@ -113,11 +115,14 @@ export default function TimetablePage() {
               <Label htmlFor="period-class">Class *</Label>
               <select
                 id="period-class"
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                disabled={classesLoading}
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                 value={newPeriod.class_ref}
                 onChange={(e) => setNewPeriod({ ...newPeriod, class_ref: e.target.value })}
               >
-                <option value="">Select a class</option>
+                <option value="">
+                  {classesLoading ? "Loading classes..." : availableClasses.length === 0 ? "No classes available" : "Select a class"}
+                </option>
                 {availableClasses.map((c) => (
                   <option key={c.id} value={c.id}>{c.name}</option>
                 ))}
