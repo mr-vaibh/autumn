@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import api, { feesApi } from "@/lib/api";
+import api, { classesApi, feesApi } from "@/lib/api";
+import { currentAcademicYearData } from "@/lib/utils";
 import { DataTable } from "@/components/shared/DataTable";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -92,19 +93,25 @@ export default function FeesPage() {
 
   useEffect(() => { fetchStructures(); fetchFees(); }, []);
 
+  // ── Resolve or create academic year ────────────────────────────────────────
+  const resolveAcademicYear = async (): Promise<number | null> => {
+    const yearRes = await api.get("/classes/academic-years/");
+    const years: { is_current: boolean; id: number }[] = yearRes.data.results || yearRes.data;
+    const current = years.find((y) => y.is_current) || years[0];
+    if (current) return current.id;
+    const created = await classesApi.createAcademicYear(currentAcademicYearData());
+    return created.data.id as number;
+  };
+
   // ── Create structure ────────────────────────────────────────────────────────
   const handleCreateStructure = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newStructure.name || !newStructure.amount) { toast.error("Name and amount are required"); return; }
     setCreatingStructure(true);
     try {
-      // Get current academic year id first
-      const yearRes = await api.get("/classes/academic-years/");
-      const years = yearRes.data.results || yearRes.data;
-      const current = years.find((y: { is_current: boolean; id: number }) => y.is_current) || years[0];
-      if (!current) { toast.error("No active academic year found"); return; }
-
-      await feesApi.createStructure({ ...newStructure, amount: Number(newStructure.amount), academic_year: current.id });
+      const yearId = await resolveAcademicYear();
+      if (!yearId) { toast.error("Could not resolve academic year"); return; }
+      await feesApi.createStructure({ ...newStructure, amount: Number(newStructure.amount), academic_year: yearId });
       toast.success("Fee structure created");
       setCreateStructureOpen(false);
       setNewStructure({ name: "", amount: "", frequency: "monthly", description: "" });

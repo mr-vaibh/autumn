@@ -53,3 +53,19 @@ export function truncate(str: string, length: number): string {
   if (!str) return "";
   return str.length > length ? `${str.substring(0, length)}...` : str;
 }
+
+// Returns { name, start_date, end_date, is_current } for the current academic year.
+// Indian schools run April–March, so May 2026 → "2026-27".
+export function currentAcademicYearData() {
+  const now = new Date();
+  const month = now.getMonth(); // 0-based
+  const year = now.getFullYear();
+  const startYear = month >= 3 ? year : year - 1;
+  const endYear = startYear + 1;
+  return {
+    name: `${startYear}-${String(endYear).slice(2)}`,
+    start_date: `${startYear}-04-01`,
+    end_date: `${endYear}-03-31`,
+    is_current: true,
+  };
+}

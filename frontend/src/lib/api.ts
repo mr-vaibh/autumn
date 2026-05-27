@@ -159,6 +159,8 @@ export const classesApi = {
     api.get("/classes/sections/", { params }),
   getAcademicYears: () =>
     api.get("/classes/academic-years/"),
+  createAcademicYear: (data: Record<string, unknown>) =>
+    api.post("/classes/academic-years/", data),
 };
 
 export const timetableApi = {

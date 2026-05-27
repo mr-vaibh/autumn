@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import api, { classesApi } from "@/lib/api";
+import { currentAcademicYearData } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
@@ -66,18 +67,29 @@ export default function ClassesPage() {
       .catch(() => {});
   }, []);
 
+  const ensureAcademicYear = async (): Promise<number | null> => {
+    if (currentYearId) return currentYearId;
+    try {
+      const res = await classesApi.createAcademicYear(currentAcademicYearData());
+      const id: number = res.data.id;
+      setCurrentYearId(id);
+      return id;
+    } catch {
+      toast.error("Failed to create academic year");
+      return null;
+    }
+  };
+
   const handleCreate = async () => {
     if (!formData.name.trim()) {
       toast.error("Class name is required");
       return;
     }
-    if (!currentYearId) {
-      toast.error("No active academic year found");
-      return;
-    }
     setCreating(true);
     try {
-      await classesApi.create({ ...formData, academic_year: currentYearId });
+      const yearId = await ensureAcademicYear();
+      if (!yearId) return;
+      await classesApi.create({ ...formData, academic_year: yearId });
       toast.success("Class created successfully");
       setDialogOpen(false);
       setFormData({ name: "", description: "" });
@@ -132,7 +144,7 @@ export default function ClassesPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Classes & Sections</h1>
-          <p className="text-sm text-gray-500 mt-0.5">Academic Year 2024-25</p>
+          <p className="text-sm text-gray-500 mt-0.5">Academic Year {currentAcademicYearData().name}</p>
         </div>
         <Button size="sm" className="gap-2 bg-black hover:bg-neutral-800 text-white" onClick={() => setDialogOpen(true)}>
           <Plus className="w-4 h-4" />
